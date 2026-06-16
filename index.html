@@ -153,6 +153,20 @@ h1{font-size:clamp(44px,7vw,76px);line-height:.95;
 .placar span{color:var(--amarelo)}
 @media(max-width:760px){.duel{grid-template-columns:1fr}.duel .meio{justify-self:center}}
 
+/* grande final (exibição) */
+.finalists-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px;margin-top:22px}
+.fcard{border:1px solid var(--borda);border-radius:16px;padding:20px;background:rgba(255,255,255,.04);text-align:center;position:relative;transition:.2s}
+.fcard .chave{font-family:'Barlow Condensed';font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--txt2)}
+.fcard .sig{display:inline-block;font-family:'Bebas Neue';font-size:30px;color:#000;background:linear-gradient(135deg,var(--amarelo),var(--laranja));border-radius:10px;padding:4px 14px;margin:8px 0}
+.fcard h3{font-size:21px;margin:6px 0;color:#fff}
+.fcard .relato{color:var(--txt2);font-size:13px;line-height:1.45}
+.fcard.champ{outline:3px solid var(--amarelo);background:rgba(255,210,0,.12);box-shadow:0 0 36px rgba(255,210,0,.4)}
+.fcard.champ::before{content:"🏆 CAMPEÃ";position:absolute;top:-13px;left:50%;transform:translateX(-50%);
+  background:var(--amarelo);color:#080808;font-family:'Bebas Neue';font-size:15px;letter-spacing:.06em;padding:3px 14px;border-radius:999px;white-space:nowrap}
+.champ-banner{margin-top:22px;padding:24px;border-radius:16px;text-align:center;
+  background:linear-gradient(90deg,var(--amarelo),var(--laranja));color:#080808;
+  font-family:'Bebas Neue';font-size:clamp(26px,5vw,40px);letter-spacing:.06em;box-shadow:0 0 40px rgba(255,96,0,.4)}
+
 /* confete */
 .confetti{position:fixed;top:-12px;border-radius:2px;z-index:99;pointer-events:none}
 @media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
@@ -173,7 +187,7 @@ footer{text-align:center;color:rgba(255,255,255,.35);font-size:13px;margin-top:5
 <nav class="pills" aria-label="Navegação">
   <button class="pill ghost" data-go="home">Início</button>
   <button class="pill" data-go="inscricao">Inscrever Seleção</button>
-  <button class="pill" data-go="chave">Ver Chave</button>
+  <button class="pill" data-go="chave">Ver Grupo</button>
   <button class="pill" data-go="pitch">Enviar Pitch</button>
   <button class="pill" data-go="votar">Votar</button>
 </nav>
@@ -185,10 +199,10 @@ footer{text-align:center;color:rgba(255,255,255,.35);font-size:13px;margin-top:5
     <ol class="tl">
       <li><b>16–20 Jun · Convocação das seleções</b><span>Inscrição dos times e escolha do Mentor Técnico (que só poderá liderar uma equipe) para entrar em campo.</span></li>
       <li><b>22 Jun – 15 Jul · Preparação e treinamento</b><span>O time se organiza, escolhe o projeto e desenvolve a proposta de inovação.</span></li>
-      <li><b>15 Jul · Sorteio das 4 Chaves</b><span>As seleções inscritas são sorteadas nas chaves A, B, C e D.</span></li>
+      <li><b>15 Jul · Sorteio dos 4 Grupos</b><span>As seleções inscritas são sorteadas nos grupos A, B, C e D.</span></li>
       <li><b>16 Jul · Entrar em campo</b><span>Envio dos pitches de 3 minutos apresentando o projeto.</span></li>
-      <li><b>17–22 Jul · Votação Seleção x Seleção</b><span>Todos votam nos confrontos das chaves — e as seleções podem pedir votos. Cada voto é um gol! Sai 1 finalista por chave.</span></li>
-      <li><b>23–24 Jul · Apresentação à Diretoria</b><span>As 4 seleções finalistas (1 por chave, com maior pontuação) apresentam seus projetos.</span></li>
+      <li><b>17–22 Jul · Votação dos grupos</b><span>Cada grupo é decidido no seu dia: 17/07 = Grupo A, 20/07 = Grupo B, 21/07 = Grupo C, 22/07 = Grupo D. Todos os colaboradores votam e as seleções podem pedir votos — cada voto é um gol! Sai 1 vencedora por grupo.</span></li>
+      <li><b>23–28 Jul · Grande Final</b><span>As 4 vencedoras de grupo apresentam seus projetos à Diretoria, que escolhe a campeã em votação secreta. O painel fica só para exibição.</span></li>
     </ol>
     <div class="final-call">🏆 <b>28 JUL</b> · DIVULGAÇÃO DO CAMPEÃO NA REUNIÃO GERAL</div>
   </div>
@@ -201,17 +215,19 @@ footer{text-align:center;color:rgba(255,255,255,.35);font-size:13px;margin-top:5
     </div>
     <div class="tabpane on" id="tab-formato">
       <p style="color:var(--txt2);line-height:1.6">Um torneio interno, onde ideias de melhoria e inovação entram em campo, são defendidas em pitches e disputadas entre seleções.</p>
-      <p style="color:var(--txt2);line-height:1.6;margin-top:10px">Cada seleção escolhe uma bandeira, monta seu elenco, desenvolve uma proposta de inovação conectada a um valor da Revvo e a defende em um pitch de até 3 minutos.</p>
+      <p style="color:var(--txt2);line-height:1.6;margin-top:10px">Cada seleção escolhe uma bandeira, monta seu elenco e desenvolve uma <b style="color:#fff">proposta de inovação aplicável à Revvo</b>, conectada a um dos nossos valores. A ideia precisa resolver um problema real e ser viável de colocar em prática — quanto mais fácil de aplicar e maior o impacto, mais forte o projeto. Tudo é defendido em um pitch de até 3 minutos.</p>
       <p style="line-height:1.6;margin-top:10px;font-family:'Barlow Condensed';font-size:19px;color:var(--amarelo)"><b>O gol? Será por votação da torcida! ⚽</b></p>
     </div>
     <div class="tabpane" id="tab-regras">
       <ul>
-        <li>Equipes de <b>5 a 15 participantes</b>.</li>
+        <li>Cada <b>seleção</b> (ou time) é uma equipe de <b>5 a 15 participantes</b> com um projeto de inovação.</li>
         <li>Capitão (Mentor Técnico) único — cada pessoa só pode liderar uma equipe.</li>
-        <li><b>4 chaves</b>, com 1 seleção vencedora em cada chave.</li>
-        <li>Votação por chave em dias específicos: <b>dia 17 = Chave A, 18 = Chave B, 19 = Chave C, 20 = Chave D</b>.</li>
+        <li>No sorteio, as seleções são distribuídas em <b>4 grupos</b> (A, B, C e D). Um <b>grupo</b> é o conjunto de seleções que disputam entre si — vence 1 seleção por grupo.</li>
         <li>Iniciativas enviadas fora do prazo são desconsideradas.</li>
       </ul>
+      <h3 style="margin-top:16px">Como funciona a votação</h3>
+      <p style="color:var(--txt2);line-height:1.6"><b style="color:#fff">Fase de grupos (17 a 22/07) — quem vota é a torcida.</b> Cada grupo é decidido no seu dia: 17/07 = Grupo A, 20/07 = Grupo B, 21/07 = Grupo C, 22/07 = Grupo D. Todos os colaboradores podem votar nas propostas do grupo do dia, e as seleções podem mobilizar sua torcida — cada voto é um gol! A seleção mais votada de cada grupo avança como vencedora.</p>
+      <p style="color:var(--txt2);line-height:1.6;margin-top:8px"><b style="color:#fff">Grande Final (23 a 28/07) — quem decide é a Diretoria.</b> As 4 vencedoras de grupo apresentam seus projetos à Diretoria, que escolhe a campeã em <b>votação secreta</b>, na reunião de encerramento. Nesta etapa, o painel mostra as finalistas apenas para acompanhamento — não há votação aberta.</p>
     </div>
     <div class="tabpane" id="tab-premio">
       <div class="premio"><span class="ic">🏅</span><span><b>Premiação Glória eterna:</b> o nome da seleção campeã entra para a história da Revvo.</span></div>
@@ -236,7 +252,7 @@ footer{text-align:center;color:rgba(255,255,255,.35);font-size:13px;margin-top:5
     <button class="btn sec mini" id="btnAddInscPlayer" style="margin-top:10px">+ Convocar jogador</button>
     <br>
     <button class="btn" id="btnInscrever">Confirmar convocação ⚽</button>
-    <div class="banner" id="bannerInscricao">✅ Seleção convocada! Bom treinamento — o sorteio das chaves sai em 15/07. Pode registrar a próxima.</div>
+    <div class="banner" id="bannerInscricao">✅ Seleção convocada! Bom treinamento — o sorteio dos grupos sai em 15/07. Pode registrar a próxima.</div>
   </div>
 </section>
 
@@ -254,8 +270,10 @@ footer{text-align:center;color:rgba(255,255,255,.35);font-size:13px;margin-top:5
     <div class="chips" id="valoresChips"></div>
     <label for="pTitulo">Título da proposta</label>
     <input id="pTitulo" placeholder="Nome da ideia">
-    <label for="pDetalhe">Detalhes</label>
-    <textarea id="pDetalhe" rows="4" placeholder="O que é, qual problema resolve e qual o impacto esperado"></textarea>
+    <label for="pProblema">Qual problema da Revvo isso resolve?</label>
+    <textarea id="pProblema" rows="3" placeholder="A dor ou oportunidade que a ideia ataca"></textarea>
+    <label for="pAplicar">Como seria aplicado na prática?</label>
+    <textarea id="pAplicar" rows="3" placeholder="Como funcionaria no dia a dia e qual o impacto esperado"></textarea>
 
     <h3>Vídeo do pitch (até 3 min)</h3>
     <label for="pUrl">Link do vídeo (YouTube / OneDrive / Drive)</label>
@@ -272,12 +290,12 @@ footer{text-align:center;color:rgba(255,255,255,.35);font-size:13px;margin-top:5
   <div class="card" id="chaveLock">
     <div class="lock"><div class="ic">🔒</div>
       <h2>Sorteio ainda não realizado</h2>
-      <p style="color:var(--txt2)">Aguarde a administradora realizar o sorteio das 4 chaves em 15/07.</p>
+      <p style="color:var(--txt2)">Aguarde a administradora realizar o sorteio dos 4 grupos em 15/07.</p>
       <button class="btn sec" data-go="home">Voltar</button>
     </div>
   </div>
   <div id="chaveContent" style="display:none">
-    <div class="card"><h2>As 4 chaves</h2><div class="groups" id="groupsGrid"></div></div>
+    <div class="card"><h2>Os 4 grupos</h2><div class="groups" id="groupsGrid"></div></div>
     <div class="card" id="championCard" style="display:none"></div>
   </div>
 </section>
@@ -324,6 +342,19 @@ footer{text-align:center;color:rgba(255,255,255,.35);font-size:13px;margin-top:5
       <div id="voteDoneActions" style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:18px"></div>
     </div>
   </div>
+
+  <!-- grande final (apenas exibição) -->
+  <div id="voteFinal" style="display:none">
+    <div class="card">
+      <div style="text-align:center">
+        <div style="font-size:48px">🏆</div>
+        <h2 style="color:var(--amarelo)">GRANDE FINAL · AS 4 FINALISTAS</h2>
+        <p style="color:var(--txt2);max-width:560px;margin:0 auto">As quatro seleções campeãs de grupo chegaram à final. Agora a decisão é da <b>Diretoria</b>, em votação secreta na reunião de encerramento. Boa sorte a todas! 🍀</p>
+      </div>
+      <div class="finalists-grid" id="finalistsGrid"></div>
+      <div id="championBanner"></div>
+    </div>
+  </div>
 </section>
 
 <footer>Copa Revvo de Inovação 2026 · Gente &amp; Gestão</footer>
@@ -343,6 +374,9 @@ const REVVO_LOGO_B64 = "";
 const VALORES = ["Valorizar a diversidade","Ser um eterno aprendiz","Honrar seus compromissos",
                  "Colaborar para que o time seja maior que o indivíduo","Ter compromisso com o resultado do cliente",
                  "Atuar com mentalidade inovadora","Tomar decisões baseadas em dados","Ser eficiente nas suas ações"];
+
+/* dia de votação de cada chave em julho */
+const DIA_CHAVE = {A:17, B:20, C:21, D:22};
 
 /* =========================================================
    HELPERS
@@ -445,10 +479,13 @@ const siglaDe = name => (name.replace(/[^A-Za-zÀ-ú]/g,"").toUpperCase()+"XXX")
 
 $("#btnPitch").onclick = async ()=>{
   const name=$("#pNome").value.trim();
-  const titulo=$("#pTitulo").value.trim(), detail=$("#pDetalhe").value.trim(), url=$("#pUrl").value.trim();
+  const titulo=$("#pTitulo").value.trim();
+  const problema=$("#pProblema").value.trim(), aplicar=$("#pAplicar").value.trim();
+  const url=$("#pUrl").value.trim();
   if(!name) return alert("Informe o nome da seleção.");
   if(!selValor) return alert("Selecione o valor da Revvo conectado à proposta.");
-  if(!titulo||!detail) return alert("Preencha o título e os detalhes da proposta.");
+  if(!titulo) return alert("Dê um título à proposta.");
+  if(!problema||!aplicar) return alert("Preencha o problema que a ideia resolve e como ela seria aplicada.");
   if(!url) return alert("Envie o link do vídeo (YouTube, OneDrive ou Drive).");
 
   $("#btnPitch").disabled = true;
@@ -460,10 +497,11 @@ $("#btnPitch").onclick = async ()=>{
   /* puxa mentor e elenco da convocação, se a seleção estiver convocada */
   const conv = Object.values(inscricoes||{}).find(t=>(t.selecao||"").toLowerCase()===name.toLowerCase());
   const convPlayers = (conv?.players||[]).map(p=> typeof p==="string"? p : p.nome).filter(Boolean);
+  const detail = `Problema: ${problema}\n\nComo aplicar: ${aplicar}`;
 
   const team = {id, flag:siglaDe(name), name, coach:conv?.mentor||teamsAll[id]?.coach||"",
                 players:convPlayers.length?convPlayers:teamsAll[id]?.players||[], valor:selValor, proposal:titulo,
-                detail, url, createdAt: teamsAll[id]?.createdAt || new Date().toISOString()};
+                problema, aplicar, detail, url, createdAt: teamsAll[id]?.createdAt || new Date().toISOString()};
   await fb.put(`copa_teams/${id}`, team);
   await fb.put(`copa_pitches/${id}`, {team:name, url, valor:selValor, proposal:titulo, submittedAt:new Date().toISOString()});
   $("#btnPitch").disabled = false;
@@ -492,7 +530,7 @@ async function renderChave(){
     const ids = bracket.groups[g] || [];
     const gm = Object.entries(matches).filter(([k,m])=>m.g===g).sort((a,b)=>a[1].r-b[1].r);
     const fin = bracket.finalists?.[g];
-    return `<div class="group g${g}"><h3>Chave ${g} <small style="font-size:13px;color:var(--txt2)">· votação dia ${16+["A","B","C","D"].indexOf(g)+1}/07</small></h3>
+    return `<div class="group g${g}"><h3>Grupo ${g} <small style="font-size:13px;color:var(--txt2)">· votação dia ${DIA_CHAVE[g]}/07</small></h3>
       ${ids.map(i=>teamTag(teams[i])).join("")}
       ${gm.map(([k,m])=>`<div class="match"><small>Rodada ${m.r}${bracket.currentMatch===k?" · 🔴 EM VOTAÇÃO":""}</small>
         ${teamTag(teams[m.a], m.winner===m.a)}<div class="vs">VS</div>${teamTag(teams[m.b], m.winner===m.b)}</div>`).join("")}
@@ -520,14 +558,36 @@ function videoEmbed(url){
 
 async function renderVotar(){
   await loadData();
-  const lock=$("#voteLock"), gen=$("#voteGeneral"), mat=$("#voteMatch"), done=$("#voteDone");
-  lock.style.display=gen.style.display=mat.style.display=done.style.display="none";
+  const lock=$("#voteLock"), gen=$("#voteGeneral"), mat=$("#voteMatch"), done=$("#voteDone"), fin=$("#voteFinal");
+  lock.style.display=gen.style.display=mat.style.display=done.style.display=fin.style.display="none";
 
-  if(phase==="match" && bracket?.currentMatch && bracket.matches?.[bracket.currentMatch]){
+  if((phase==="final"||phase==="fim") && bracket){
+    fin.style.display="block"; renderFinal();
+  } else if(phase==="match" && bracket?.currentMatch && bracket.matches?.[bracket.currentMatch]){
     mat.style.display="block"; renderMatch(bracket.currentMatch);
   } else if(phase==="vote"){
     gen.style.display="block"; renderGeneral();
   } else lock.style.display="block";
+}
+
+/* grande final — apenas exibição, decisão da diretoria é presencial e secreta */
+function renderFinal(){
+  const fins = bracket.finalists || {};
+  const champ = bracket.champion;
+  $("#finalistsGrid").innerHTML = ["A","B","C","D"].map(g=>{
+    const t = teams[fins[g]];
+    if(!t) return `<div class="fcard"><div class="chave">Grupo ${g}</div><div class="sig">—</div><h3 style="color:var(--txt2)">A definir</h3></div>`;
+    return `<div class="fcard${champ===t.id?" champ":""}">
+      <div class="chave">Campeã do Grupo ${g}</div>
+      <div class="sig">${esc(t.flag)}</div>
+      <h3>${esc(t.name)}</h3>
+      <p class="relato"><b>${esc(t.proposal||"")}</b><br>${esc(t.valor||"")}</p>
+    </div>`;
+  }).join("");
+  $("#championBanner").innerHTML = (champ && teams[champ])
+    ? `<div class="champ-banner">🏆 CAMPEÃ DA COPA REVVO 2026<br>${esc(teams[champ].name)}</div>`
+    : `<p style="text-align:center;color:var(--txt2);margin-top:20px">Aguardando a decisão da Diretoria na reunião de encerramento…</p>`;
+  if(champ && teams[champ]) confetti();
 }
 
 async function renderGeneral(){
@@ -551,10 +611,11 @@ let matchPoll=null;
 async function renderMatch(key){
   clearInterval(matchPoll);
   const m = bracket.matches[key], A=teams[m.a], B=teams[m.b];
-  $("#matchTitle").textContent = `Chave ${m.g} · Rodada ${m.r} — ${A?.name||"?"} × ${B?.name||"?"}`;
+  $("#matchTitle").textContent = `Grupo ${m.g} · Rodada ${m.r} — ${A?.name||"?"} × ${B?.name||"?"}`;
   const propHTML = (t,side)=>`
     <h3 style="color:${side==="a"?"var(--ciano)":"var(--laranja)"}">${esc(t.flag)} · ${esc(t.name)}</h3>
-    <p class="relato"><b>${esc(t.proposal)}</b> · valor: ${esc(t.valor)}<br>${esc(t.detail)}</p>
+    <p class="relato"><b>${esc(t.proposal)}</b> · valor: ${esc(t.valor)}<br>
+      ${t.problema?`<b>Problema:</b> ${esc(t.problema)}<br><b>Como aplicar:</b> ${esc(t.aplicar||"")}`:esc(t.detail||"")}</p>
     ${videoEmbed(t.url)}
     <button class="btn" style="width:100%" onclick="voteMatch('${key}','${t.id}')">${esc(t.name)} é melhor ⚽</button>`;
   $("#propA").innerHTML = A?propHTML(A,"a"):""; $("#propB").innerHTML = B?propHTML(B,"b"):"";

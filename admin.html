@@ -138,14 +138,14 @@ a{color:var(--ciano)}
 <!-- ============ SORTEIO ============ -->
 <section class="pane" id="pane-sorteio">
   <div class="card">
-    <h2>Sorteio das 4 chaves</h2>
+    <h2>Sorteio dos 4 grupos</h2>
     <div class="hint" style="margin-bottom:12px">
       <b>Como o sorteio conversa com as fases:</b><br>
       1. O sorteio só usa seleções que já <b>enviaram o pitch</b>.<br>
-      2. Ao sortear, a fase muda sozinha para <b>Jogo Ativo</b> e os participantes passam a ver as chaves.<br>
+      2. Ao sortear, a fase muda sozinha para <b>Jogo Ativo</b> e os participantes passam a ver os grupos.<br>
       3. Depois, em <b>Jogo Ativo</b>, você escolhe qual confronto está em votação (botão "Ativar votação").
     </div>
-    <p style="color:var(--txt2);font-size:14px">Embaralha as seleções inscritas, distribui nas chaves A–D e gera os confrontos da 1ª rodada de cada chave. Em chaves com número ímpar, a última seleção avança de <i>bye</i>.</p>
+    <p style="color:var(--txt2);font-size:14px">Embaralha as seleções inscritas, distribui nos grupos A–D e gera os confrontos da 1ª rodada de cada grupo. Em grupos com número ímpar de seleções, a última avança de <i>bye</i>.</p>
     <button class="btn" onclick="sorteio()" style="margin-top:12px">🎲 Realizar sorteio</button>
     <div class="groups" id="adminGroups"></div>
   </div>
@@ -159,8 +159,12 @@ a{color:var(--ciano)}
     <div id="matchControls"></div>
   </div>
   <div class="card">
-    <h2>Campeão</h2>
-    <p style="color:var(--txt2);font-size:14px">Após a apresentação à Diretoria (23–24/07), declare a seleção campeã entre as 4 finalistas.</p>
+    <h2>Final da Diretoria 🏆</h2>
+    <div class="hint" style="margin-bottom:10px">
+      A fase <b>Final (Diretoria)</b> deixa o painel dos participantes apenas em <b>exibição</b>, mostrando as 4 finalistas lado a lado — sem botão de votar.
+      A votação da Diretoria é <b>secreta e presencial</b>, decidida na reunião de encerramento (23 a 28/07). Aqui você só registra a campeã ao final.
+    </div>
+    <p style="color:var(--txt2);font-size:14px">Para abrir o telão da final, mude a fase para <b>Final (Diretoria)</b> no Dashboard. Depois da decisão, registre a seleção campeã:</p>
     <div id="championControls" style="margin-top:10px"></div>
   </div>
 </section>
@@ -182,8 +186,10 @@ const fb={
   del:p=>fetch(`${DB}/${p}.json`,{method:"DELETE"})
 };
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-const PHASES=[["pre","Pré-copa"],["inscricao","Inscrição"],["pitch","Pitch"],["vote","Votação geral"],["match","Jogo ativo"],["fim","Encerrada"]];
+const PHASES=[["pre","Pré-copa"],["inscricao","Inscrição"],["pitch","Pitch"],["vote","Votação geral"],["match","Jogo ativo"],["final","Final (Diretoria)"],["fim","Encerrada"]];
 const GROUPS=["A","B","C","D"];
+const DIA_CHAVE={A:17, B:20, C:21, D:22};
+const DIA_PARA_CHAVE={17:"A", 20:"B", 21:"C", 22:"D"};
 let teams={}, bracket=null, phase="pre", insc={}, votes={};
 
 /* ================= LOGIN ================= */
@@ -244,7 +250,7 @@ window.resetNode=async(node,label)=>{
   await fb.del(node); refreshAll();
 };
 window.resetAll=async()=>{
-  if(!confirm("Resetar TODO o torneio (seleções, pitches, votos, chaves, inscrições)?")) return;
+  if(!confirm("Resetar TODO o torneio (seleções, pitches, votos, grupos, inscrições)?")) return;
   if(!confirm("Tem certeza absoluta? Não dá para desfazer.")) return;
   await Promise.all(["copa_teams","copa_pitches","copa_votes","copa_bracket","copa_inscricoes"].map(fb.del));
   await fb.put("copa_phase","pre"); refreshAll();
@@ -289,19 +295,91 @@ window.delInsc=async id=>{ if(confirm("Remover esta inscrição?")){ await fb.de
 /* ================= PITCHES ================= */
 function renderPitches(){
   const rows=Object.values(teams);
-  $("#pitchTable").innerHTML = rows.length ? `<table><tr><th>Seleção</th><th>Capitão</th><th>Jogadores</th><th>Proposta</th><th>Vídeo</th></tr>
-    ${rows.map(t=>`<tr><td><span class="tag">${esc(t.flag)}</span> ${esc(t.name)}</td><td>${esc(t.coach)}</td>
-      <td>${(t.players||[]).length}</td>
-      <td><b>${esc(t.proposal||"—")}</b><br><small style="color:var(--txt2)">${esc(t.valor||"")}</small></td>
-      <td>${t.url ? (String(t.url).startsWith("data:") ? "📎 arquivo enviado" : `<a href="${esc(t.url)}" target="_blank" rel="noopener">▶ abrir</a>`) : "—"}</td></tr>`).join("")}</table>`
-    : "<p style='color:var(--txt2)'>Nenhuma seleção inscrita ainda.</p>";
+  if(!rows.length){ $("#pitchTable").innerHTML="<p style='color:var(--txt2)'>Nenhum pitch enviado ainda.</p>"; return; }
+  /* índice de inscrições por nome de seleção (para cruzar) */
+  const inscByName={}; Object.values(insc).forEach(t=>{ if(t.selecao) inscByName[t.selecao.toLowerCase()]=t; });
+
+  $("#pitchTable").innerHTML = `
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px">
+      <button class="btn green mini" onclick="exportPitches()">⬇ Relatório de pitches (CSV)</button>
+      <button class="btn sec mini" onclick="exportCruzado()">⬇ Relatório cruzado inscrição × pitch (CSV)</button>
+      <span class="tag">${rows.length} pitches</span>
+    </div>
+    ${rows.map(t=>{
+      const conv=inscByName[(t.name||"").toLowerCase()];
+      const grupo = bracket?.groups ? Object.keys(bracket.groups).find(g=>bracket.groups[g].includes(t.id)) : null;
+      return `<div class="group" style="margin-bottom:14px">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap">
+          <div><b style="font-size:17px;color:var(--amarelo)">${esc(t.flag)} · ${esc(t.name)}</b>
+            <div style="color:var(--txt2);font-size:13px">Capitão: ${esc(t.coach||"—")} · ${(t.players||[]).length} jogadores${grupo?` · Grupo ${grupo}`:""}
+              · ${conv?'<span style="color:var(--verde)">✔ inscrição vinculada</span>':'<span style="color:#ff8a8a">⚠ sem inscrição correspondente</span>'}</div></div>
+          ${t.url ? (String(t.url).startsWith("data:") ? '<span class="tag">📎 arquivo</span>' : `<a class="btn sec mini" href="${esc(t.url)}" target="_blank" rel="noopener">▶ ver vídeo</a>`) : '<span class="tag">sem vídeo</span>'}
+        </div>
+        <table style="margin-top:10px">
+          <tr><th style="width:140px">Campo</th><th>Conteúdo</th></tr>
+          <tr><td>Valor da Revvo</td><td>${esc(t.valor||"—")}</td></tr>
+          <tr><td>Título da proposta</td><td><b>${esc(t.proposal||"—")}</b></td></tr>
+          <tr><td>Problema que resolve</td><td>${esc(t.problema||"—")}</td></tr>
+          <tr><td>Como seria aplicado</td><td>${esc(t.aplicar||"—")}</td></tr>
+          <tr><td>Link do vídeo</td><td>${t.url?(String(t.url).startsWith("data:")?"(arquivo enviado)":`<a href="${esc(t.url)}" target="_blank" rel="noopener">${esc(t.url)}</a>`):"—"}</td></tr>
+          <tr><td>Jogadores</td><td>${esc((t.players||[]).join(", ")||"—")}</td></tr>
+        </table>
+      </div>`;
+    }).join("")}`;
+}
+
+/* relatório só dos pitches (1 linha por seleção, todos os campos) */
+window.exportPitches=()=>{
+  const head=["Selecao","Sigla","Grupo","Capitao","Qtd jogadores","Valor Revvo","Titulo","Problema que resolve","Como aplicar","Link video"];
+  const lines=[head];
+  Object.values(teams).forEach(t=>{
+    const grupo = bracket?.groups ? (Object.keys(bracket.groups).find(g=>bracket.groups[g].includes(t.id))||"") : "";
+    lines.push([t.name||"", t.flag||"", grupo, t.coach||"", (t.players||[]).length,
+      t.valor||"", t.proposal||"", t.problema||"", t.aplicar||"",
+      String(t.url||"").startsWith("data:")?"(arquivo enviado)":(t.url||"")]);
+  });
+  baixarCSV(lines, "pitches");
+};
+
+/* relatório cruzado: inscrição (time + jogadores) × pitch (proposta) */
+window.exportCruzado=()=>{
+  const head=["Selecao","Mentor/Capitao","Status pitch","Grupo","Valor Revvo","Titulo proposta","Problema","Como aplicar","Link video","Jogador","Setor","Email"];
+  const lines=[head];
+  const teamsByName={}; Object.values(teams).forEach(t=>{ if(t.name) teamsByName[t.name.toLowerCase()]=t; });
+  /* base = inscrições; para cada jogador, anexa dados do pitch da seleção (se houver) */
+  Object.values(insc).forEach(ins=>{
+    const t=teamsByName[(ins.selecao||"").toLowerCase()];
+    const grupo = (t&&bracket?.groups) ? (Object.keys(bracket.groups).find(g=>bracket.groups[g].includes(t.id))||"") : "";
+    const base=[ins.selecao||"", ins.mentor||"", t?"pitch enviado":"sem pitch", grupo,
+      t?.valor||"", t?.proposal||"", t?.problema||"", t?.aplicar||"",
+      String(t?.url||"").startsWith("data:")?"(arquivo enviado)":(t?.url||"")];
+    const players = ins.players||[];
+    if(!players.length){ lines.push([...base,"","",""]); }
+    else players.forEach(p=>{ const o=typeof p==="string"?{nome:p}:p; lines.push([...base, o.nome||"", o.setor||"", o.email||""]); });
+  });
+  /* seleções que enviaram pitch mas não têm inscrição correspondente */
+  const inscNames=new Set(Object.values(insc).map(i=>(i.selecao||"").toLowerCase()));
+  Object.values(teams).forEach(t=>{
+    if(inscNames.has((t.name||"").toLowerCase())) return;
+    const grupo = bracket?.groups ? (Object.keys(bracket.groups).find(g=>bracket.groups[g].includes(t.id))||"") : "";
+    lines.push([t.name||"", t.coach||"", "pitch sem inscrição", grupo, t.valor||"", t.proposal||"", t.problema||"", t.aplicar||"",
+      String(t.url||"").startsWith("data:")?"(arquivo enviado)":(t.url||""), "(elenco não vinculado)","",""]);
+  });
+  baixarCSV(lines, "cruzado-inscricao-pitch");
+};
+
+function baixarCSV(lines, nome){
+  const csv="\uFEFF"+lines.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(";")).join("\n");
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv;charset=utf-8"}));
+  a.download=`copa-revvo-${nome}-${new Date().toISOString().slice(0,10)}.csv`; a.click();
 }
 
 /* ================= SORTEIO / CHAVES ================= */
 window.sorteio=async()=>{
   const ids=Object.keys(teams);
   if(ids.length<4) return alert("É preciso ter pelo menos 4 seleções com pitch enviado para sortear.");
-  if(bracket && !confirm("Já existe um sorteio. Refazer apaga chaves e votos de jogos. Continuar?")) return;
+  if(bracket && !confirm("Já existe um sorteio. Refazer apaga grupos e votos de jogos. Continuar?")) return;
   /* embaralha */
   for(let i=ids.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [ids[i],ids[j]]=[ids[j],ids[i]]; }
   const groups={A:[],B:[],C:[],D:[]};
@@ -313,7 +391,7 @@ window.sorteio=async()=>{
   await fb.put("copa_bracket",bracket);
   await fb.del("copa_votes"); /* zera votos de jogos antigos */
   await fb.put("copa_phase","match"); /* libera a fase de jogos para os participantes verem a chave */
-  alert("Sorteio realizado! As 4 chaves foram geradas e a fase mudou para JOGO ATIVO.\n\nAgora vá em \"Jogo Ativo\" e clique em \"Ativar votação\" no confronto que quer abrir.");
+  alert("Sorteio realizado! Os 4 grupos foram gerados e a fase mudou para JOGO ATIVO.\n\nAgora vá em \"Jogo Ativo\" e clique em \"Ativar votação\" no confronto que quer abrir.");
   refreshAll();
 };
 /* gera confrontos de uma rodada; ímpar = bye automático para o último */
@@ -345,8 +423,8 @@ function syncFinalists(){
 }
 window.nextRound=async g=>{
   const s=survivors(g);
-  if(s===null) return alert(`A rodada atual da Chave ${g} ainda tem jogo sem vencedor.`);
-  if(s.length<=1) return alert(`A Chave ${g} já tem finalista.`);
+  if(s===null) return alert(`A rodada atual do Grupo ${g} ainda tem jogo sem vencedor.`);
+  if(s.length<=1) return alert(`O Grupo ${g} já tem finalista.`);
   const gm=Object.values(bracket.matches).filter(m=>m.g===g);
   genRound(g,s,Math.max(...gm.map(m=>m.r))+1,bracket.matches);
   syncFinalists();
@@ -363,7 +441,7 @@ function renderGroups(sel,withControls){
   box.innerHTML=GROUPS.map(g=>{
     const gm=Object.entries(bracket.matches||{}).filter(([k,m])=>m.g===g).sort((a,b)=>a[1].r-b[1].r);
     const s=survivors(g), fin=bracket.finalists?.[g];
-    return `<div class="group g${g}"><h3>Chave ${g} <small style="font-size:12px;color:var(--txt2)">dia ${17+GROUPS.indexOf(g)}/07</small></h3>
+    return `<div class="group g${g}"><h3>Grupo ${g} <small style="font-size:12px;color:var(--txt2)">dia ${DIA_CHAVE[g]}/07</small></h3>
       ${(bracket.groups[g]||[]).map(i=>teamTag(teams[i])).join("")}
       ${gm.map(([k,m])=>`<div class="match"><small>Rodada ${m.r} · ${k}${bracket.currentMatch===k?" · 🔴 EM VOTAÇÃO":""}</small>
         ${teamTag(teams[m.a],m.winner===m.a)}<div class="vs">VS</div>${teamTag(teams[m.b],m.winner===m.b)}
@@ -381,9 +459,8 @@ function renderGroups(sel,withControls){
 /* ================= JOGO ATIVO ================= */
 function renderJogo(){
   const d=new Date(), hint=$("#dayHint");
-  const map={17:"A",18:"B",19:"C",20:"D"};
-  const sug=(d.getMonth()===6 && map[d.getDate()]) ? `Hoje é ${d.getDate()}/07 — chave sugerida pela regra: <b>Chave ${map[d.getDate()]}</b>.` 
-    : "Regra do calendário: 17/07 = Chave A · 18 = B · 19 = C · 20 = D.";
+  const sug=(d.getMonth()===6 && DIA_PARA_CHAVE[d.getDate()]) ? `Hoje é ${d.getDate()}/07 — grupo sugerido pela regra: <b>Grupo ${DIA_PARA_CHAVE[d.getDate()]}</b>.`
+    : "Regra do calendário: 17/07 = Grupo A · 20 = B · 21 = C · 22 = D.";
   hint.innerHTML=sug;
   if(!bracket?.matches){ $("#matchControls").innerHTML="<p style='color:var(--txt2)'>Realize o sorteio primeiro.</p>"; $("#championControls").innerHTML=""; return; }
 
@@ -392,7 +469,7 @@ function renderJogo(){
     <p style="margin-bottom:6px">Jogo ativo agora: <b style="color:var(--amarelo)">${bracket.currentMatch || "nenhum"}</b></p>
     ${pend.length? `<label>Escolher jogo</label>
       <div style="display:flex;gap:10px;flex-wrap:wrap">
-        <select id="selMatch" style="max-width:420px">${pend.map(([k,m])=>`<option value="${k}">Chave ${m.g} · R${m.r} — ${esc(teams[m.a]?.name)} × ${esc(teams[m.b]?.name)}</option>`).join("")}</select>
+        <select id="selMatch" style="max-width:420px">${pend.map(([k,m])=>`<option value="${k}">Grupo ${m.g} · R${m.r} — ${esc(teams[m.a]?.name)} × ${esc(teams[m.b]?.name)}</option>`).join("")}</select>
         <button class="btn" onclick="setActive(document.getElementById('selMatch').value)">▶ Ativar votação</button>
         <button class="btn sec" onclick="setActive(null)">⏹ Encerrar votação</button>
       </div>`
@@ -400,7 +477,7 @@ function renderJogo(){
 
   const fins=Object.entries(bracket.finalists||{});
   $("#championControls").innerHTML = fins.length
-    ? fins.map(([g,id])=>`<button class="btn green mini" style="margin:4px" onclick="declareChampion('${id}')">🏆 ${esc(teams[id]?.name)} (Chave ${g})</button>`).join("")
+    ? fins.map(([g,id])=>`<button class="btn green mini" style="margin:4px" onclick="declareChampion('${id}')">🏆 ${esc(teams[id]?.name)} (Grupo ${g})</button>`).join("")
       + (bracket.champion?`<p style="margin-top:10px;color:var(--amarelo);font-weight:700">Campeã atual: ${esc(teams[bracket.champion]?.name)}</p>`:"")
     : "<p style='color:var(--txt2)'>Ainda não há finalistas definidas.</p>";
 }
@@ -446,7 +523,7 @@ function renderVotos(){
     const c={}; Object.values(v).forEach(t=>c[t]=(c[t]||0)+1);
     const tot=Object.values(v).length||1;
     return `<div style="margin:14px 0;padding-bottom:10px;border-bottom:1px dashed var(--borda)">
-      <b>Jogo ${k}</b> ${m?`<small style="color:var(--txt2)">· Chave ${m.g} R${m.r}</small>`:""}
+      <b>Jogo ${k}</b> ${m?`<small style="color:var(--txt2)">· Grupo ${m.g} R${m.r}</small>`:""}
       ${Object.entries(c).sort((a,b)=>b[1]-a[1]).map(([id,n])=>`
         <div style="display:flex;justify-content:space-between;margin-top:6px"><span>${esc(teams[id]?.name||id)}</span><b style="color:var(--amarelo)">${n} ⚽</b></div>
         <div class="votebar"><i style="width:${n/tot*100}%"></i></div>`).join("")}
