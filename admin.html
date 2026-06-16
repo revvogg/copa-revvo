@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Copa Revvo 2026 · Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --laranja:#FF6000; --amarelo:#FFD200; --ciano:#00BAFF; --azul:#006BFF;
+  --verde:#00D17A; --campo1:#0E8A4B; --campo2:#0BA84A; --bg:#080808;
+  --card:rgba(8,8,8,.6); --borda:rgba(255,255,255,.14); --txt:#F4F4F4; --txt2:rgba(244,244,244,.7);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--txt);font-family:'Barlow',sans-serif;min-height:100vh}
+h1,h2,.bebas{font-family:'Bebas Neue';letter-spacing:.04em}
+button{font-family:'Barlow Condensed';cursor:pointer}
+input,select{font-family:'Barlow';padding:11px 13px;border-radius:10px;border:1px solid var(--borda);background:rgba(255,255,255,.06);color:var(--txt);font-size:15px;width:100%}
+input:focus,select:focus{outline:2px solid var(--ciano)}
+label{display:block;font-family:'Barlow Condensed';font-weight:600;font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--txt2);margin:14px 0 5px}
+.field{position:fixed;inset:0;z-index:-1;background:
+  linear-gradient(180deg, rgba(8,8,8,.4), rgba(8,8,8,.88) 70%),
+  repeating-linear-gradient(90deg, var(--campo1) 0 110px, var(--campo2) 110px 220px)}
+.wrap{max-width:1100px;margin:0 auto;padding:26px 18px 80px}
+header{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:18px}
+h1{font-size:36px;background:linear-gradient(90deg,var(--amarelo),var(--laranja));-webkit-background-clip:text;background-clip:text;color:transparent}
+.card{background:var(--card);backdrop-filter:blur(12px);border:1px solid var(--borda);border-radius:16px;padding:22px;margin:14px 0}
+.card h2{color:var(--amarelo);font-size:26px;margin-bottom:12px}
+.btn{display:inline-block;padding:11px 22px;border:none;border-radius:10px;font-size:16px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#080808;background:linear-gradient(90deg,var(--laranja),var(--amarelo))}
+.btn.sec{background:transparent;border:1px solid var(--ciano);color:var(--ciano)}
+.btn.danger{background:transparent;border:1px solid #ff5d5d;color:#ff8a8a}
+.btn.green{background:var(--verde);color:#04130b}
+.btn.mini{padding:7px 13px;font-size:13px}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.tabsnav{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 4px}
+.tabsnav button{padding:10px 18px;border-radius:999px;border:1px solid var(--borda);background:var(--card);color:var(--txt);font-size:15px;font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+.tabsnav button.on{background:var(--azul);border-color:var(--azul)}
+.pane{display:none}.pane.on{display:block}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px}
+.stat{border:1px solid var(--borda);border-radius:14px;padding:16px;text-align:center;background:rgba(255,255,255,.04)}
+.stat b{display:block;font-family:'Bebas Neue';font-size:40px;color:var(--ciano)}
+.stat span{font-family:'Barlow Condensed';text-transform:uppercase;font-size:13px;letter-spacing:.07em;color:var(--txt2)}
+.phases{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.phase{padding:9px 16px;border-radius:10px;border:1px solid var(--borda);background:transparent;color:var(--txt2);font-size:14px;font-weight:700;text-transform:uppercase}
+.phase.on{background:var(--verde);border-color:var(--verde);color:#04130b}
+table{width:100%;border-collapse:collapse;margin-top:10px;font-size:14px}
+th{font-family:'Barlow Condensed';text-transform:uppercase;letter-spacing:.06em;font-size:13px;color:var(--txt2);text-align:left;padding:8px;border-bottom:1px solid var(--borda)}
+td{padding:9px 8px;border-bottom:1px dashed var(--borda);vertical-align:top}
+a{color:var(--ciano)}
+.groups{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;margin-top:12px}
+.group{border:1px solid var(--borda);border-radius:14px;padding:14px;background:rgba(255,255,255,.04)}
+.group h3{font-family:'Barlow Condensed';font-size:22px;text-transform:uppercase;margin-bottom:8px}
+.gA h3{color:var(--amarelo)}.gB h3{color:var(--ciano)}.gC h3{color:var(--verde)}.gD h3{color:var(--laranja)}
+.mteam{display:flex;align-items:center;gap:8px;padding:6px 9px;border-radius:8px;background:rgba(255,255,255,.05);margin-top:5px;font-size:14px}
+.mteam .sig{font-family:'Barlow Condensed';font-weight:700;font-size:12px;letter-spacing:.08em;background:#000;border:1px solid var(--borda);border-radius:6px;padding:2px 6px}
+.mteam.win{outline:2px solid var(--verde)}
+.match{border-top:1px dashed var(--borda);padding-top:8px;margin-top:9px}
+.match small{color:var(--txt2)}
+.vs{text-align:center;font-family:'Bebas Neue';color:var(--txt2);font-size:13px}
+.finalista{margin-top:10px;padding:9px;border-radius:9px;background:rgba(0,209,122,.13);border:1px solid var(--verde);font-size:14px;font-weight:600}
+.votebar{height:12px;border-radius:999px;background:rgba(255,255,255,.1);overflow:hidden;margin-top:6px}
+.votebar i{display:block;height:100%;background:linear-gradient(90deg,var(--ciano),var(--azul))}
+.hint{padding:10px 14px;border-radius:10px;background:rgba(0,186,255,.1);border:1px solid var(--ciano);font-size:14px;margin-bottom:10px}
+.tag{display:inline-block;padding:2px 9px;border-radius:999px;border:1px solid var(--borda);font-size:12px;font-family:'Barlow Condensed';text-transform:uppercase;letter-spacing:.06em;color:var(--txt2)}
+/* login */
+#loginOverlay{position:fixed;inset:0;background:rgba(8,8,8,.85);backdrop-filter:blur(8px);display:grid;place-items:center;z-index:50}
+#loginOverlay .card{width:min(380px,92vw);text-align:center}
+.muted{color:var(--txt2);font-size:13px;margin-top:8px}
+</style>
+</head>
+<body>
+<div class="field" aria-hidden="true"></div>
+
+<div id="loginOverlay">
+  <div class="card">
+    <h1 style="font-size:30px">⚙️ COPA REVVO · ADMIN</h1>
+    <label for="loginPass" style="text-align:left">Senha de administração</label>
+    <input id="loginPass" type="password" placeholder="••••••••••">
+    <button class="btn" id="btnLogin" style="margin-top:16px;width:100%">Entrar</button>
+    <p class="muted" id="loginMsg"></p>
+  </div>
+</div>
+
+<div class="wrap" id="app" style="display:none">
+<header>
+  <h1>COPA REVVO 2026 · PAINEL G&amp;G</h1>
+  <button class="btn sec mini" onclick="logout()">Sair</button>
+</header>
+
+<nav class="tabsnav">
+  <button class="on" data-pane="dash">Dashboard</button>
+  <button data-pane="insc">Inscrições</button>
+  <button data-pane="pitch">Pitches</button>
+  <button data-pane="sorteio">Sorteio</button>
+  <button data-pane="jogo">Jogo Ativo</button>
+  <button data-pane="votos">Votos</button>
+</nav>
+
+<!-- ============ DASHBOARD ============ -->
+<section class="pane on" id="pane-dash">
+  <div class="card">
+    <h2>Visão geral</h2>
+    <div class="stats" id="stats"></div>
+  </div>
+  <div class="card">
+    <h2>Fase do torneio</h2>
+    <p style="color:var(--txt2);font-size:14px">A fase controla o que os participantes veem no app.</p>
+    <div class="phases" id="phases"></div>
+  </div>
+  <div class="card">
+    <h2>Trocar senha do painel</h2>
+    <label for="newPass">Nova senha</label>
+    <div style="display:flex;gap:10px;flex-wrap:wrap"><input id="newPass" type="text" placeholder="Nova senha" style="max-width:320px"><button class="btn" onclick="changePass()">Salvar</button></div>
+    <p class="muted">A senha fica no Firebase (<code>copa_admin_pass</code>), não no código.</p>
+  </div>
+  <div class="card">
+    <h2>Ações de reset</h2>
+    <p style="color:var(--txt2);font-size:14px;margin-bottom:10px">⚠️ Irreversíveis. LGPD: ao fim do torneio, apague as inscrições — só retenha o necessário para a dinâmica.</p>
+    <button class="btn danger mini" onclick="resetNode('copa_votes','todos os votos')">Zerar votos</button>
+    <button class="btn danger mini" onclick="resetNode('copa_bracket','o chaveamento')">Apagar chaveamento</button>
+    <button class="btn danger mini" onclick="resetNode('copa_inscricoes','as inscrições de jogadores (LGPD)')">Apagar inscrições</button>
+    <button class="btn danger mini" onclick="resetAll()">Resetar TUDO</button>
+  </div>
+</section>
+
+<!-- ============ INSCRIÇÕES ============ -->
+<section class="pane" id="pane-insc">
+  <div class="card"><h2>Inscrições de jogadores</h2><div id="inscTable"></div></div>
+</section>
+
+<!-- ============ PITCHES ============ -->
+<section class="pane" id="pane-pitch">
+  <div class="card"><h2>Seleções &amp; pitches</h2><div id="pitchTable"></div></div>
+</section>
+
+<!-- ============ SORTEIO ============ -->
+<section class="pane" id="pane-sorteio">
+  <div class="card">
+    <h2>Sorteio dos 4 grupos</h2>
+    <div class="hint" style="margin-bottom:12px">
+      <b>Como o sorteio conversa com as fases:</b><br>
+      1. O sorteio só usa seleções que já <b>enviaram o pitch</b>.<br>
+      2. Ao sortear, a fase muda sozinha para <b>Jogo Ativo</b> e os participantes passam a ver os grupos.<br>
+      3. Depois, em <b>Jogo Ativo</b>, você escolhe qual confronto está em votação (botão "Ativar votação").
+    </div>
+    <p style="color:var(--txt2);font-size:14px">Embaralha as seleções inscritas, distribui nos grupos A–D e gera os confrontos da 1ª rodada de cada grupo. Em grupos com número ímpar de seleções, a última avança de <i>bye</i>.</p>
+    <button class="btn" onclick="sorteio()" style="margin-top:12px">🎲 Realizar sorteio</button>
+    <div class="groups" id="adminGroups"></div>
+  </div>
+</section>
+
+<!-- ============ JOGO ATIVO ============ -->
+<section class="pane" id="pane-jogo">
+  <div class="card">
+    <h2>Jogo em votação</h2>
+    <div class="hint" id="dayHint"></div>
+    <div id="matchControls"></div>
+  </div>
+  <div class="card">
+    <h2>Final da Diretoria 🏆</h2>
+    <div class="hint" style="margin-bottom:10px">
+      A fase <b>Final (Diretoria)</b> deixa o painel dos participantes apenas em <b>exibição</b>, mostrando as 4 finalistas lado a lado — sem botão de votar.
+      A votação da Diretoria é <b>secreta e presencial</b>, decidida na reunião de encerramento (23 a 28/07). Aqui você só registra a campeã ao final.
+    </div>
+    <p style="color:var(--txt2);font-size:14px">Para abrir o telão da final, mude a fase para <b>Final (Diretoria)</b> no Dashboard. Depois da decisão, registre a seleção campeã:</p>
+    <div id="championControls" style="margin-top:10px"></div>
+  </div>
+</section>
+
+<!-- ============ VOTOS ============ -->
+<section class="pane" id="pane-votos">
+  <div class="card"><h2>Ranking geral</h2><div id="votesGeneral"></div></div>
+  <div class="card"><h2>Votos por jogo</h2><div id="votesMatches"></div></div>
+</section>
+</div>
+
+<script>
+const DB = "https://copa-revvo-default-rtdb.firebaseio.com";
+const DEFAULT_PASS = "RevvoAdmin2026";
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const fb={
+  get:p=>fetch(`${DB}/${p}.json`).then(r=>r.json()),
+  put:(p,v)=>fetch(`${DB}/${p}.json`,{method:"PUT",body:JSON.stringify(v)}).then(r=>r.json()),
+  del:p=>fetch(`${DB}/${p}.json`,{method:"DELETE"})
+};
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const PHASES=[["pre","Pré-copa"],["inscricao","Inscrição"],["pitch","Pitch"],["vote","Votação geral"],["match","Jogo ativo"],["final","Final (Diretoria)"],["fim","Encerrada"]];
+const GROUPS=["A","B","C","D"];
+const DIA_CHAVE={A:17, B:20, C:21, D:22};
+const DIA_PARA_CHAVE={17:"A", 20:"B", 21:"C", 22:"D"};
+let teams={}, bracket=null, phase="pre", insc={}, votes={};
+
+/* ================= LOGIN ================= */
+$("#btnLogin").onclick=login;
+$("#loginPass").addEventListener("keydown",e=>{if(e.key==="Enter")login()});
+async function login(){
+  $("#loginMsg").textContent="Verificando…";
+  let pass = await fb.get("copa_admin_pass");
+  if(pass===null){ await fb.put("copa_admin_pass", DEFAULT_PASS); pass=DEFAULT_PASS; }
+  if($("#loginPass").value===pass){
+    sessionStorage.copa_admin="1";
+    $("#loginOverlay").style.display="none"; $("#app").style.display="block"; refreshAll();
+  } else $("#loginMsg").textContent="Senha incorreta.";
+}
+function logout(){ sessionStorage.removeItem("copa_admin"); location.reload(); }
+if(sessionStorage.copa_admin==="1"){ $("#loginOverlay").style.display="none"; $("#app").style.display="block"; refreshAll(); }
+
+/* ================= NAV ================= */
+document.querySelector(".tabsnav").addEventListener("click",e=>{
+  const b=e.target.closest("[data-pane]"); if(!b) return;
+  $$(".tabsnav button").forEach(x=>x.classList.toggle("on",x===b));
+  $$(".pane").forEach(p=>p.classList.remove("on"));
+  $("#pane-"+b.dataset.pane).classList.add("on");
+  refreshAll();
+});
+
+/* ================= LOAD + RENDER ================= */
+async function refreshAll(){
+  [teams,bracket,phase,insc,votes]=await Promise.all([
+    fb.get("copa_teams"),fb.get("copa_bracket"),fb.get("copa_phase"),fb.get("copa_inscricoes"),fb.get("copa_votes")]);
+  teams=teams||{}; insc=insc||{}; votes=votes||{}; phase=phase||"pre";
+  renderDash(); renderInsc(); renderPitches(); renderGroups("#adminGroups",true); renderJogo(); renderVotos();
+}
+
+function renderDash(){
+  const nMatches = bracket?.matches ? Object.keys(bracket.matches).length : 0;
+  const nVotes = Object.values(votes).reduce((a,v)=>a+Object.keys(v||{}).length,0);
+  $("#stats").innerHTML=`
+    <div class="stat"><b>${Object.keys(insc).length}</b><span>Times convocados</span></div>
+    <div class="stat"><b>${Object.values(insc).reduce((a,t)=>a+(t.players||[]).length,0)}</b><span>Jogadores</span></div>
+    <div class="stat"><b>${Object.keys(teams).length}</b><span>Seleções no pitch</span></div>
+    <div class="stat"><b>${Object.values(teams).filter(t=>t.url).length}</b><span>Pitches</span></div>
+    <div class="stat"><b>${nVotes}</b><span>Votos (gols)</span></div>
+    <div class="stat"><b>${nMatches}</b><span>Jogos</span></div>`;
+  $("#phases").innerHTML=PHASES.map(([k,l])=>`<button class="phase ${phase===k?"on":""}" onclick="setPhase('${k}')">${l}</button>`).join("");
+}
+window.setPhase=async k=>{ await fb.put("copa_phase",k); refreshAll(); };
+
+async function changePass(){
+  const p=$("#newPass").value.trim();
+  if(p.length<6) return alert("Use ao menos 6 caracteres.");
+  await fb.put("copa_admin_pass",p); $("#newPass").value=""; alert("Senha atualizada ✔");
+}
+window.changePass=changePass;
+
+window.resetNode=async(node,label)=>{
+  if(!confirm(`Apagar ${label}? Esta ação é irreversível.`)) return;
+  await fb.del(node); refreshAll();
+};
+window.resetAll=async()=>{
+  if(!confirm("Resetar TODO o torneio (seleções, pitches, votos, grupos, inscrições)?")) return;
+  if(!confirm("Tem certeza absoluta? Não dá para desfazer.")) return;
+  await Promise.all(["copa_teams","copa_pitches","copa_votes","copa_bracket","copa_inscricoes"].map(fb.del));
+  await fb.put("copa_phase","pre"); refreshAll();
+};
+
+/* ================= INSCRIÇÕES ================= */
+function renderInsc(){
+  const rows=Object.entries(insc).sort((a,b)=>(a[1].createdAt||"").localeCompare(b[1].createdAt||""));
+  if(!rows.length){ $("#inscTable").innerHTML="<p style='color:var(--txt2)'>Nenhuma seleção convocada ainda.</p>"; return; }
+  const totalJog = rows.reduce((a,[,t])=>a+(t.players||[]).length,0);
+  $("#inscTable").innerHTML = `
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px">
+      <button class="btn green mini" onclick="exportInsc()">⬇ Relatório geral (CSV)</button>
+      <span class="tag">${rows.length} seleções</span><span class="tag">${totalJog} jogadores</span>
+    </div>
+    ${rows.map(([id,t])=>`
+      <div class="group" style="margin-bottom:14px">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
+          <div><b style="font-size:17px;color:var(--amarelo)">${esc(t.selecao||t.nome||"")}</b>
+            <div style="color:var(--txt2);font-size:13px">Mentor: ${esc(t.mentor||"—")} · ${(t.players||[]).length} jogadores · ${t.createdAt?new Date(t.createdAt).toLocaleDateString("pt-BR"):""}</div></div>
+          <button class="btn danger mini" onclick="delInsc('${id}')">Remover seleção</button>
+        </div>
+        <table style="margin-top:10px"><tr><th>#</th><th>Jogador</th><th>Setor</th><th>E-mail</th></tr>
+          ${(t.players||[]).map((p,i)=>{ const o=typeof p==="string"?{nome:p}:p;
+            return `<tr><td>${i+1}</td><td>${esc(o.nome||"")}</td><td>${esc(o.setor||"")}</td><td>${esc(o.email||"")}</td></tr>`;}).join("")}
+        </table>
+      </div>`).join("")}`;
+}
+window.exportInsc=()=>{
+  const lines=[["Selecao","Mentor","Jogador","Setor","Email","Data inscricao"]];
+  Object.values(insc).forEach(t=>{
+    (t.players||[]).forEach(p=>{ const o=typeof p==="string"?{nome:p}:p;
+      lines.push([t.selecao||t.nome||"", t.mentor||"", o.nome||"", o.setor||"", o.email||"", t.createdAt?new Date(t.createdAt).toLocaleString("pt-BR"):""]); });
+  });
+  const csv="\uFEFF"+lines.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(";")).join("\n");
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv;charset=utf-8"}));
+  a.download=`copa-revvo-inscricoes-${new Date().toISOString().slice(0,10)}.csv`; a.click();
+};
+window.delInsc=async id=>{ if(confirm("Remover esta inscrição?")){ await fb.del(`copa_inscricoes/${id}`); refreshAll(); } };
+
+/* ================= PITCHES ================= */
+function renderPitches(){
+  const rows=Object.values(teams);
+  if(!rows.length){ $("#pitchTable").innerHTML="<p style='color:var(--txt2)'>Nenhum pitch enviado ainda.</p>"; return; }
+  /* índice de inscrições por nome de seleção (para cruzar) */
+  const inscByName={}; Object.values(insc).forEach(t=>{ if(t.selecao) inscByName[t.selecao.toLowerCase()]=t; });
+
+  $("#pitchTable").innerHTML = `
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px">
+      <button class="btn green mini" onclick="exportPitches()">⬇ Relatório de pitches (CSV)</button>
+      <button class="btn sec mini" onclick="exportCruzado()">⬇ Relatório cruzado inscrição × pitch (CSV)</button>
+      <span class="tag">${rows.length} pitches</span>
+    </div>
+    ${rows.map(t=>{
+      const conv=inscByName[(t.name||"").toLowerCase()];
+      const grupo = bracket?.groups ? Object.keys(bracket.groups).find(g=>bracket.groups[g].includes(t.id)) : null;
+      return `<div class="group" style="margin-bottom:14px">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap">
+          <div><b style="font-size:17px;color:var(--amarelo)">${esc(t.flag)} · ${esc(t.name)}</b>
+            <div style="color:var(--txt2);font-size:13px">Capitão: ${esc(t.coach||"—")} · ${(t.players||[]).length} jogadores${grupo?` · Grupo ${grupo}`:""}
+              · ${conv?'<span style="color:var(--verde)">✔ inscrição vinculada</span>':'<span style="color:#ff8a8a">⚠ sem inscrição correspondente</span>'}</div></div>
+          ${t.url ? (String(t.url).startsWith("data:") ? '<span class="tag">📎 arquivo</span>' : `<a class="btn sec mini" href="${esc(t.url)}" target="_blank" rel="noopener">▶ ver vídeo</a>`) : '<span class="tag">sem vídeo</span>'}
+        </div>
+        <table style="margin-top:10px">
+          <tr><th style="width:140px">Campo</th><th>Conteúdo</th></tr>
+          <tr><td>Valor da Revvo</td><td>${esc(t.valor||"—")}</td></tr>
+          <tr><td>Título da proposta</td><td><b>${esc(t.proposal||"—")}</b></td></tr>
+          <tr><td>Problema que resolve</td><td>${esc(t.problema||"—")}</td></tr>
+          <tr><td>Como seria aplicado</td><td>${esc(t.aplicar||"—")}</td></tr>
+          <tr><td>Link do vídeo</td><td>${t.url?(String(t.url).startsWith("data:")?"(arquivo enviado)":`<a href="${esc(t.url)}" target="_blank" rel="noopener">${esc(t.url)}</a>`):"—"}</td></tr>
+          <tr><td>Jogadores</td><td>${esc((t.players||[]).join(", ")||"—")}</td></tr>
+        </table>
+      </div>`;
+    }).join("")}`;
+}
+
+/* relatório só dos pitches (1 linha por seleção, todos os campos) */
+window.exportPitches=()=>{
+  const head=["Selecao","Sigla","Grupo","Capitao","Qtd jogadores","Valor Revvo","Titulo","Problema que resolve","Como aplicar","Link video"];
+  const lines=[head];
+  Object.values(teams).forEach(t=>{
+    const grupo = bracket?.groups ? (Object.keys(bracket.groups).find(g=>bracket.groups[g].includes(t.id))||"") : "";
+    lines.push([t.name||"", t.flag||"", grupo, t.coach||"", (t.players||[]).length,
+      t.valor||"", t.proposal||"", t.problema||"", t.aplicar||"",
+      String(t.url||"").startsWith("data:")?"(arquivo enviado)":(t.url||"")]);
+  });
+  baixarCSV(lines, "pitches");
+};
+
+/* relatório cruzado: inscrição (time + jogadores) × pitch (proposta) */
+window.exportCruzado=()=>{
+  const head=["Selecao","Mentor/Capitao","Status pitch","Grupo","Valor Revvo","Titulo proposta","Problema","Como aplicar","Link video","Jogador","Setor","Email"];
+  const lines=[head];
+  const teamsByName={}; Object.values(teams).forEach(t=>{ if(t.name) teamsByName[t.name.toLowerCase()]=t; });
+  /* base = inscrições; para cada jogador, anexa dados do pitch da seleção (se houver) */
+  Object.values(insc).forEach(ins=>{
+    const t=teamsByName[(ins.selecao||"").toLowerCase()];
+    const grupo = (t&&bracket?.groups) ? (Object.keys(bracket.groups).find(g=>bracket.groups[g].includes(t.id))||"") : "";
+    const base=[ins.selecao||"", ins.mentor||"", t?"pitch enviado":"sem pitch", grupo,
+      t?.valor||"", t?.proposal||"", t?.problema||"", t?.aplicar||"",
+      String(t?.url||"").startsWith("data:")?"(arquivo enviado)":(t?.url||"")];
+    const players = ins.players||[];
+    if(!players.length){ lines.push([...base,"","",""]); }
+    else players.forEach(p=>{ const o=typeof p==="string"?{nome:p}:p; lines.push([...base, o.nome||"", o.setor||"", o.email||""]); });
+  });
+  /* seleções que enviaram pitch mas não têm inscrição correspondente */
+  const inscNames=new Set(Object.values(insc).map(i=>(i.selecao||"").toLowerCase()));
+  Object.values(teams).forEach(t=>{
+    if(inscNames.has((t.name||"").toLowerCase())) return;
+    const grupo = bracket?.groups ? (Object.keys(bracket.groups).find(g=>bracket.groups[g].includes(t.id))||"") : "";
+    lines.push([t.name||"", t.coach||"", "pitch sem inscrição", grupo, t.valor||"", t.proposal||"", t.problema||"", t.aplicar||"",
+      String(t.url||"").startsWith("data:")?"(arquivo enviado)":(t.url||""), "(elenco não vinculado)","",""]);
+  });
+  baixarCSV(lines, "cruzado-inscricao-pitch");
+};
+
+function baixarCSV(lines, nome){
+  const csv="\uFEFF"+lines.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(";")).join("\n");
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv;charset=utf-8"}));
+  a.download=`copa-revvo-${nome}-${new Date().toISOString().slice(0,10)}.csv`; a.click();
+}
+
+/* ================= SORTEIO / CHAVES ================= */
+window.sorteio=async()=>{
+  const ids=Object.keys(teams);
+  if(ids.length<4) return alert("É preciso ter pelo menos 4 seleções com pitch enviado para sortear.");
+  if(bracket && !confirm("Já existe um sorteio. Refazer apaga grupos e votos de jogos. Continuar?")) return;
+  /* embaralha */
+  for(let i=ids.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [ids[i],ids[j]]=[ids[j],ids[i]]; }
+  const groups={A:[],B:[],C:[],D:[]};
+  ids.forEach((id,i)=>groups[GROUPS[i%4]].push(id));
+  const matches={};
+  GROUPS.forEach(g=>genRound(g,groups[g],1,matches));
+  bracket={createdAt:new Date().toISOString(),groups,matches,winners:{},finalists:{},champion:null,currentMatch:null};
+  syncFinalists();
+  await fb.put("copa_bracket",bracket);
+  await fb.del("copa_votes"); /* zera votos de jogos antigos */
+  await fb.put("copa_phase","match"); /* libera a fase de jogos para os participantes verem a chave */
+  alert("Sorteio realizado! Os 4 grupos foram gerados e a fase mudou para JOGO ATIVO.\n\nAgora vá em \"Jogo Ativo\" e clique em \"Ativar votação\" no confronto que quer abrir.");
+  refreshAll();
+};
+/* gera confrontos de uma rodada; ímpar = bye automático para o último */
+function genRound(g,ids,r,matches){
+  let n=Object.keys(matches).filter(k=>matches[k].g===g).length;
+  for(let i=0;i+1<ids.length;i+=2) matches[`${g}${n++}`]={g,r,a:ids[i],b:ids[i+1],winner:null};
+  if(ids.length%2===1) matches[`${g}${n++}`]={g,r,a:ids[ids.length-1],b:null,winner:ids[ids.length-1]}; /* bye */
+}
+/* sobreviventes da última rodada de uma chave */
+function survivors(g){
+  const gm=Object.values(bracket.matches).filter(m=>m.g===g);
+  if(!gm.length) return [];
+  const lastR=Math.max(...gm.map(m=>m.r));
+  const lastMs=gm.filter(m=>m.r===lastR);
+  if(lastMs.some(m=>!m.winner)) return null; /* rodada incompleta */
+  return lastMs.map(m=>m.winner);
+}
+/* marca finalista em chaves onde restou 1 sobrevivente (inclui byes automáticos) */
+function syncFinalists(){
+  bracket.finalists=bracket.finalists||{};
+  GROUPS.forEach(g=>{
+    if(bracket.finalists[g]) return;
+    const s=survivors(g);
+    if(s && s.length===1) bracket.finalists[g]=s[0];
+    /* chave com 1 só seleção e nenhum jogo */
+    if((bracket.groups[g]||[]).length===1 && !Object.values(bracket.matches||{}).some(m=>m.g===g))
+      bracket.finalists[g]=bracket.groups[g][0];
+  });
+}
+window.nextRound=async g=>{
+  const s=survivors(g);
+  if(s===null) return alert(`A rodada atual do Grupo ${g} ainda tem jogo sem vencedor.`);
+  if(s.length<=1) return alert(`O Grupo ${g} já tem finalista.`);
+  const gm=Object.values(bracket.matches).filter(m=>m.g===g);
+  genRound(g,s,Math.max(...gm.map(m=>m.r))+1,bracket.matches);
+  syncFinalists();
+  await fb.put("copa_bracket",bracket); refreshAll();
+};
+
+const teamTag=(t,win=false)=> t
+  ? `<div class="mteam${win?" win":""}"><span class="sig">${esc(t.flag)}</span>${esc(t.name)}${win?" ✔":""}</div>`
+  : `<div class="mteam"><span class="sig">—</span><i style="color:var(--txt2)">bye</i></div>`;
+
+function renderGroups(sel,withControls){
+  const box=$(sel);
+  if(!bracket?.groups){ box.innerHTML="<p style='color:var(--txt2);margin-top:10px'>Sorteio ainda não realizado.</p>"; return; }
+  box.innerHTML=GROUPS.map(g=>{
+    const gm=Object.entries(bracket.matches||{}).filter(([k,m])=>m.g===g).sort((a,b)=>a[1].r-b[1].r);
+    const s=survivors(g), fin=bracket.finalists?.[g];
+    return `<div class="group g${g}"><h3>Grupo ${g} <small style="font-size:12px;color:var(--txt2)">dia ${DIA_CHAVE[g]}/07</small></h3>
+      ${(bracket.groups[g]||[]).map(i=>teamTag(teams[i])).join("")}
+      ${gm.map(([k,m])=>`<div class="match"><small>Rodada ${m.r} · ${k}${bracket.currentMatch===k?" · 🔴 EM VOTAÇÃO":""}</small>
+        ${teamTag(teams[m.a],m.winner===m.a)}<div class="vs">VS</div>${teamTag(teams[m.b],m.winner===m.b)}
+        ${withControls&&!m.winner&&m.b?`
+          <button class="btn sec mini" onclick="setActive('${k}')">▶ Pôr em votação</button>
+          <button class="btn green mini" onclick="declareWinner('${k}','${m.a}')">Vence ${esc(teams[m.a]?.flag)}</button>
+          <button class="btn green mini" onclick="declareWinner('${k}','${m.b}')">Vence ${esc(teams[m.b]?.flag)}</button>`:""}
+      </div>`).join("")}
+      ${fin?`<div class="finalista">⭐ Finalista: ${esc(teams[fin]?.name||"")}</div>`
+        : (withControls && s && s.length>1 ? `<button class="btn sec mini" style="margin-top:10px" onclick="nextRound('${g}')">Gerar próxima rodada</button>`:"")}
+    </div>`;
+  }).join("");
+}
+
+/* ================= JOGO ATIVO ================= */
+function renderJogo(){
+  const d=new Date(), hint=$("#dayHint");
+  const sug=(d.getMonth()===6 && DIA_PARA_CHAVE[d.getDate()]) ? `Hoje é ${d.getDate()}/07 — grupo sugerido pela regra: <b>Grupo ${DIA_PARA_CHAVE[d.getDate()]}</b>.`
+    : "Regra do calendário: 17/07 = Grupo A · 20 = B · 21 = C · 22 = D.";
+  hint.innerHTML=sug;
+  if(!bracket?.matches){ $("#matchControls").innerHTML="<p style='color:var(--txt2)'>Realize o sorteio primeiro.</p>"; $("#championControls").innerHTML=""; return; }
+
+  const pend=Object.entries(bracket.matches).filter(([k,m])=>!m.winner&&m.b);
+  $("#matchControls").innerHTML = `
+    <p style="margin-bottom:6px">Jogo ativo agora: <b style="color:var(--amarelo)">${bracket.currentMatch || "nenhum"}</b></p>
+    ${pend.length? `<label>Escolher jogo</label>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <select id="selMatch" style="max-width:420px">${pend.map(([k,m])=>`<option value="${k}">Grupo ${m.g} · R${m.r} — ${esc(teams[m.a]?.name)} × ${esc(teams[m.b]?.name)}</option>`).join("")}</select>
+        <button class="btn" onclick="setActive(document.getElementById('selMatch').value)">▶ Ativar votação</button>
+        <button class="btn sec" onclick="setActive(null)">⏹ Encerrar votação</button>
+      </div>`
+      : "<p style='color:var(--txt2)'>Não há jogos pendentes.</p>"}`;
+
+  const fins=Object.entries(bracket.finalists||{});
+  $("#championControls").innerHTML = fins.length
+    ? fins.map(([g,id])=>`<button class="btn green mini" style="margin:4px" onclick="declareChampion('${id}')">🏆 ${esc(teams[id]?.name)} (Grupo ${g})</button>`).join("")
+      + (bracket.champion?`<p style="margin-top:10px;color:var(--amarelo);font-weight:700">Campeã atual: ${esc(teams[bracket.champion]?.name)}</p>`:"")
+    : "<p style='color:var(--txt2)'>Ainda não há finalistas definidas.</p>";
+}
+window.setActive=async k=>{
+  bracket.currentMatch=k||null;
+  await fb.put("copa_bracket/currentMatch", bracket.currentMatch);
+  if(k) await fb.put("copa_phase","match");
+  refreshAll();
+};
+window.declareWinner=async(k,id)=>{
+  const m=bracket.matches[k];
+  if(!confirm(`Declarar ${teams[id]?.name} vencedora do jogo ${k}?`)) return;
+  m.winner=id; bracket.winners=bracket.winners||{}; bracket.winners[k]=id;
+  if(bracket.currentMatch===k) bracket.currentMatch=null;
+  /* se a chave ficou com 1 sobrevivente, vira finalista */
+  const s=survivors(m.g);
+  if(s && s.length===1){ bracket.finalists=bracket.finalists||{}; bracket.finalists[m.g]=s[0]; }
+  await fb.put("copa_bracket",bracket); refreshAll();
+};
+window.declareChampion=async id=>{
+  if(!confirm(`Declarar ${teams[id]?.name} CAMPEÃ da Copa Revvo 2026?`)) return;
+  bracket.champion=id;
+  await fb.put("copa_bracket/champion",id);
+  await fb.put("copa_phase","fim");
+  refreshAll();
+};
+
+/* ================= VOTOS ================= */
+function renderVotos(){
+  /* geral */
+  const gen=votes.general||{};
+  const cg={}; Object.values(gen).forEach(t=>cg[t]=(cg[t]||0)+1);
+  const tg=Object.values(gen).length||1;
+  $("#votesGeneral").innerHTML = Object.keys(cg).length
+    ? Object.entries(cg).sort((a,b)=>b[1]-a[1]).map(([id,n])=>`
+      <div style="margin:10px 0"><div style="display:flex;justify-content:space-between"><span>${esc(teams[id]?.name||id)}</span><b style="color:var(--amarelo)">${n} ⚽</b></div>
+      <div class="votebar"><i style="width:${n/tg*100}%"></i></div></div>`).join("")
+    : "<p style='color:var(--txt2)'>Sem votos na votação geral.</p>";
+  /* por jogo */
+  const mkeys=Object.keys(votes).filter(k=>k!=="general");
+  $("#votesMatches").innerHTML = mkeys.length ? mkeys.sort().map(k=>{
+    const v=votes[k], m=bracket?.matches?.[k];
+    const c={}; Object.values(v).forEach(t=>c[t]=(c[t]||0)+1);
+    const tot=Object.values(v).length||1;
+    return `<div style="margin:14px 0;padding-bottom:10px;border-bottom:1px dashed var(--borda)">
+      <b>Jogo ${k}</b> ${m?`<small style="color:var(--txt2)">· Grupo ${m.g} R${m.r}</small>`:""}
+      ${Object.entries(c).sort((a,b)=>b[1]-a[1]).map(([id,n])=>`
+        <div style="display:flex;justify-content:space-between;margin-top:6px"><span>${esc(teams[id]?.name||id)}</span><b style="color:var(--amarelo)">${n} ⚽</b></div>
+        <div class="votebar"><i style="width:${n/tot*100}%"></i></div>`).join("")}
+    </div>`;
+  }).join("") : "<p style='color:var(--txt2)'>Sem votos em jogos.</p>";
+}
+
+/* refresh automático */
+setInterval(()=>{ if(sessionStorage.copa_admin==="1") refreshAll(); }, 15000);
+</script>
+</body>
+</html>

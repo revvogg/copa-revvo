@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Copa Revvo de Inovação 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;500;600;700&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --laranja:#FF6000; --amarelo:#FFD200; --ciano:#00BAFF; --azul:#006BFF;
+  --verde:#00D17A; --campo1:#0E8A4B; --campo2:#0BA84A; --bg:#080808;
+  --card:rgba(8,8,8,.55); --borda:rgba(255,255,255,.14); --txt:#F4F4F4; --txt2:rgba(244,244,244,.72);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--txt);font-family:'Barlow',sans-serif;min-height:100vh}
+h1,h2,.bebas{font-family:'Bebas Neue',sans-serif;letter-spacing:.04em}
+h3,h4,.cond{font-family:'Barlow Condensed',sans-serif}
+a{color:var(--ciano)}
+button{font-family:'Barlow Condensed',sans-serif;cursor:pointer}
+input,select,textarea{font-family:'Barlow',sans-serif;width:100%;padding:12px 14px;border-radius:10px;border:1px solid var(--borda);background:rgba(255,255,255,.06);color:var(--txt);font-size:15px}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--ciano);border-color:transparent}
+label{display:block;font-family:'Barlow Condensed';font-weight:600;font-size:14px;text-transform:uppercase;letter-spacing:.08em;color:var(--txt2);margin:16px 0 6px}
+
+/* ===== fundo campo de futebol ===== */
+.field{
+  position:fixed;inset:0;z-index:-1;
+  background:
+    radial-gradient(circle at 50% 30%, rgba(255,255,255,.07), transparent 45%),
+    linear-gradient(180deg, rgba(8,8,8,.25), rgba(8,8,8,.78) 75%),
+    repeating-linear-gradient(90deg, var(--campo1) 0 110px, var(--campo2) 110px 220px);
+}
+.field::before{ /* círculo central */
+  content:"";position:absolute;left:50%;top:30%;width:340px;height:340px;
+  transform:translate(-50%,-50%);border:3px solid rgba(255,255,255,.22);border-radius:50%;
+  background:rgba(255,255,255,.03);
+}
+.field::after{ /* linha do meio-campo */
+  content:"";position:absolute;left:0;right:0;top:30%;height:3px;background:rgba(255,255,255,.18);
+}
+
+.wrap{max-width:1080px;margin:0 auto;padding:28px 18px 90px}
+header{display:flex;flex-direction:column;align-items:center;text-align:center;gap:10px;padding:26px 0 8px}
+.logo{height:54px;mix-blend-mode:screen}
+.logo-txt{font-family:'Bebas Neue';font-size:42px;color:#fff;letter-spacing:.12em}
+h1{font-size:clamp(44px,7vw,76px);line-height:.95;
+   background:linear-gradient(90deg,var(--amarelo),var(--laranja));-webkit-background-clip:text;background-clip:text;color:transparent}
+.sub{font-family:'Barlow Condensed';font-size:clamp(17px,2.4vw,22px);color:var(--txt2);max-width:560px}
+
+/* pills de navegação */
+.pills{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin:26px 0 8px;position:sticky;top:10px;z-index:5}
+.pill{padding:12px 22px;border-radius:999px;border:1px solid var(--borda);font-size:17px;font-weight:600;
+  letter-spacing:.05em;text-transform:uppercase;background:var(--card);backdrop-filter:blur(10px);color:var(--txt);transition:.18s}
+.pill:hover{border-color:var(--laranja);color:var(--amarelo)}
+.pill.on{background:linear-gradient(90deg,var(--laranja),var(--amarelo));color:#080808;border-color:transparent}
+.pill.ghost{border-style:dashed}
+
+/* cards translúcidos */
+.card{background:var(--card);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  border:1px solid var(--borda);border-radius:18px;padding:26px;margin:18px 0}
+.card h2{font-size:30px;color:var(--amarelo);margin-bottom:14px}
+.card h3{font-size:21px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin:14px 0 6px;color:var(--ciano)}
+
+/* timeline */
+.tl{list-style:none;counter-reset:etapa;display:grid;gap:0}
+.tl li{counter-increment:etapa;position:relative;padding:14px 0 14px 64px;border-left:2px solid rgba(255,255,255,.15);margin-left:23px}
+.tl li:last-child{border-left-color:transparent}
+.tl li::before{content:counter(etapa);position:absolute;left:-24px;top:12px;width:46px;height:46px;border-radius:50%;
+  display:grid;place-items:center;font-family:'Bebas Neue';font-size:22px;color:#080808;
+  background:linear-gradient(135deg,var(--amarelo),var(--laranja));box-shadow:0 0 0 5px rgba(8,8,8,.6)}
+.tl b{display:block;font-family:'Barlow Condensed';font-size:19px;text-transform:uppercase;letter-spacing:.05em;color:var(--amarelo)}
+.tl span{color:var(--txt2);font-size:15px;line-height:1.45}
+.final-call{margin-top:20px;padding:18px 22px;border-radius:14px;text-align:center;
+  font-family:'Bebas Neue';font-size:clamp(20px,3.4vw,30px);letter-spacing:.08em;color:#080808;
+  background:linear-gradient(90deg,var(--amarelo),var(--laranja));
+  box-shadow:0 0 32px rgba(255,210,0,.35);animation:pulse 2.6s ease-in-out infinite}
+.final-call b{color:#080808}
+@keyframes pulse{0%,100%{box-shadow:0 0 22px rgba(255,210,0,.3)}50%{box-shadow:0 0 44px rgba(255,96,0,.5)}}
+
+/* abas */
+.tabs{display:flex;gap:8px;margin:8px 0 16px;flex-wrap:wrap}
+.tab{padding:9px 20px;border-radius:10px;border:1px solid var(--borda);background:transparent;color:var(--txt2);font-size:16px;font-weight:600;text-transform:uppercase;letter-spacing:.06em}
+.tab.on{background:var(--azul);border-color:var(--azul);color:#fff}
+.tabpane{display:none}.tabpane.on{display:block}
+.tabpane ul{margin:6px 0 0 20px;color:var(--txt2);line-height:1.7}
+.premio{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px dashed var(--borda);font-size:16px}
+.premio:last-child{border-bottom:none}
+.premio .ic{font-size:26px}
+
+/* telas */
+.screen{display:none}.screen.on{display:block;animation:fade .25s ease}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.back{background:none;border:none;color:var(--ciano);font-size:16px;margin-bottom:6px;text-transform:uppercase;letter-spacing:.06em}
+
+/* botões */
+.btn{display:inline-block;padding:14px 34px;border:none;border-radius:12px;font-size:19px;font-weight:700;
+  text-transform:uppercase;letter-spacing:.07em;color:#080808;background:linear-gradient(90deg,var(--laranja),var(--amarelo));margin-top:20px;transition:.15s}
+.btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(255,96,0,.35)}
+.btn.sec{background:transparent;border:1px solid var(--ciano);color:var(--ciano)}
+.btn.mini{padding:8px 16px;font-size:14px;margin-top:0}
+.btn:disabled{opacity:.45;cursor:not-allowed;transform:none;box-shadow:none}
+
+/* banner de sucesso */
+.banner{display:none;background:linear-gradient(90deg,var(--verde),#0BA84A);color:#04130b;font-weight:700;
+  padding:14px 18px;border-radius:12px;margin-top:16px;font-size:16px}
+.banner.show{display:block;animation:fade .3s}
+
+/* jogadores dinâmicos */
+.player-row{display:flex;gap:8px;margin-top:8px}
+.player-row input{flex:1}
+.player-row button{border:1px solid var(--borda);background:rgba(255,255,255,.06);color:#ff8a8a;border-radius:10px;width:44px;font-size:18px;flex:none}
+.pl-multi .pl-nome{flex:1.2}
+@media(max-width:620px){.pl-multi{flex-wrap:wrap}.pl-multi input{flex:1 1 100%}.pl-multi button{flex:1 1 100%;width:auto}}
+
+/* chips de valores */
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.chip{padding:9px 16px;border-radius:999px;border:1px solid var(--borda);background:rgba(255,255,255,.05);color:var(--txt2);font-size:14px;font-weight:600}
+.chip.on{background:var(--ciano);border-color:var(--ciano);color:#04131a}
+
+/* chaves / bracket */
+.groups{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px}
+.group{border:1px solid var(--borda);border-radius:14px;padding:16px;background:rgba(255,255,255,.04)}
+.group h3{margin-top:0;font-size:24px}
+.gA h3{color:var(--amarelo)}.gB h3{color:var(--ciano)}.gC h3{color:var(--verde)}.gD h3{color:var(--laranja)}
+.mteam{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;background:rgba(255,255,255,.05);margin-top:6px;font-size:15px}
+.mteam .sig{font-family:'Barlow Condensed';font-weight:700;font-size:13px;letter-spacing:.08em;background:#000;border:1px solid var(--borda);border-radius:6px;padding:2px 7px}
+.mteam.win{outline:2px solid var(--verde)}
+.vs{ text-align:center;font-family:'Bebas Neue';color:var(--txt2);font-size:14px;margin:2px 0}
+.match{border-top:1px dashed var(--borda);padding-top:8px;margin-top:10px}
+.match small{color:var(--txt2)}
+.finalista{margin-top:12px;padding:10px;border-radius:10px;background:rgba(0,209,122,.12);border:1px solid var(--verde);font-weight:600}
+
+/* votação */
+.lock{ text-align:center;padding:50px 20px}
+.lock .ic{font-size:54px}
+.votebar{height:14px;border-radius:999px;background:rgba(255,255,255,.1);overflow:hidden;margin-top:8px}
+.votebar i{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,var(--ciano),var(--azul));transition:width .5s}
+.voterow{padding:14px 0;border-bottom:1px dashed var(--borda)}
+.voterow:last-child{border:none}
+.voterow .top{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.gols{font-family:'Bebas Neue';font-size:24px;color:var(--amarelo)}
+
+/* match vote lado a lado */
+.duel{display:grid;grid-template-columns:1fr auto 1fr;gap:16px;align-items:start}
+.duel .meio{font-family:'Bebas Neue';font-size:44px;color:var(--amarelo);align-self:center}
+.prop{border:1px solid var(--borda);border-radius:16px;padding:18px;background:rgba(255,255,255,.04)}
+.prop h3{margin-top:0}
+.prop .relato{color:var(--txt2);font-size:14px;line-height:1.5;margin:8px 0}
+.prop iframe,.prop video{width:100%;aspect-ratio:16/9;border:none;border-radius:10px;background:#000}
+.placar{display:flex;justify-content:center;gap:30px;font-family:'Bebas Neue';font-size:54px;margin:8px 0}
+.placar span{color:var(--amarelo)}
+@media(max-width:760px){.duel{grid-template-columns:1fr}.duel .meio{justify-self:center}}
+
+/* grande final (exibição) */
+.finalists-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px;margin-top:22px}
+.fcard{border:1px solid var(--borda);border-radius:16px;padding:20px;background:rgba(255,255,255,.04);text-align:center;position:relative;transition:.2s}
+.fcard .chave{font-family:'Barlow Condensed';font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--txt2)}
+.fcard .sig{display:inline-block;font-family:'Bebas Neue';font-size:30px;color:#000;background:linear-gradient(135deg,var(--amarelo),var(--laranja));border-radius:10px;padding:4px 14px;margin:8px 0}
+.fcard h3{font-size:21px;margin:6px 0;color:#fff}
+.fcard .relato{color:var(--txt2);font-size:13px;line-height:1.45}
+.fcard.champ{outline:3px solid var(--amarelo);background:rgba(255,210,0,.12);box-shadow:0 0 36px rgba(255,210,0,.4)}
+.fcard.champ::before{content:"🏆 CAMPEÃ";position:absolute;top:-13px;left:50%;transform:translateX(-50%);
+  background:var(--amarelo);color:#080808;font-family:'Bebas Neue';font-size:15px;letter-spacing:.06em;padding:3px 14px;border-radius:999px;white-space:nowrap}
+.champ-banner{margin-top:22px;padding:24px;border-radius:16px;text-align:center;
+  background:linear-gradient(90deg,var(--amarelo),var(--laranja));color:#080808;
+  font-family:'Bebas Neue';font-size:clamp(26px,5vw,40px);letter-spacing:.06em;box-shadow:0 0 40px rgba(255,96,0,.4)}
+
+/* confete */
+.confetti{position:fixed;top:-12px;border-radius:2px;z-index:99;pointer-events:none}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+footer{text-align:center;color:rgba(255,255,255,.35);font-size:13px;margin-top:50px}
+</style>
+</head>
+<body>
+<div class="field" aria-hidden="true"></div>
+<div class="wrap">
+
+<header>
+  <img id="logoImg" class="logo" alt="Revvo" style="display:none">
+  <div id="logoTxt" class="logo-txt">REVVO</div>
+  <h1>COPA REVVO DE INOVAÇÃO 2026</h1>
+  <p class="sub">Onde as melhores ideias entram em campo e viram melhorias reais</p>
+</header>
+
+<nav class="pills" aria-label="Navegação">
+  <button class="pill ghost" data-go="home">Início</button>
+  <button class="pill" data-go="inscricao">Inscrever Seleção</button>
+  <button class="pill" data-go="chave">Ver Grupo</button>
+  <button class="pill" data-go="pitch">Enviar Pitch</button>
+  <button class="pill" data-go="votar">Votar</button>
+</nav>
+
+<!-- ===================== TELA 0 — ABERTURA ===================== -->
+<section class="screen on" id="scr-home">
+  <div class="card">
+    <h2>Calendário do torneio</h2>
+    <ol class="tl">
+      <li><b>16–20 Jun · Convocação das seleções</b><span>Inscrição dos times e escolha do Mentor Técnico (que só poderá liderar uma equipe) para entrar em campo.</span></li>
+      <li><b>22 Jun – 15 Jul · Preparação e treinamento</b><span>O time se organiza, escolhe o projeto e desenvolve a proposta de inovação.</span></li>
+      <li><b>15 Jul · Sorteio dos 4 Grupos</b><span>As seleções inscritas são sorteadas nos grupos A, B, C e D.</span></li>
+      <li><b>16 Jul · Entrar em campo</b><span>Envio dos pitches de 3 minutos apresentando o projeto.</span></li>
+      <li><b>17–22 Jul · Votação dos grupos</b><span>Cada grupo é decidido no seu dia: 17/07 = Grupo A, 20/07 = Grupo B, 21/07 = Grupo C, 22/07 = Grupo D. Todos os colaboradores votam e as seleções podem pedir votos — cada voto é um gol! Sai 1 vencedora por grupo.</span></li>
+      <li><b>23–28 Jul · Grande Final</b><span>As 4 vencedoras de grupo apresentam seus projetos à Diretoria, que escolhe a campeã em votação secreta. O painel fica só para exibição.</span></li>
+    </ol>
+    <div class="final-call">🏆 <b>28 JUL</b> · DIVULGAÇÃO DO CAMPEÃO NA REUNIÃO GERAL</div>
+  </div>
+
+  <div class="card">
+    <div class="tabs" role="tablist">
+      <button class="tab on" data-tab="formato">Formato</button>
+      <button class="tab" data-tab="regras">Regras</button>
+      <button class="tab" data-tab="premio">Premiação</button>
+    </div>
+    <div class="tabpane on" id="tab-formato">
+      <p style="color:var(--txt2);line-height:1.6">Um torneio interno, onde ideias de melhoria e inovação entram em campo, são defendidas em pitches e disputadas entre seleções.</p>
+      <p style="color:var(--txt2);line-height:1.6;margin-top:10px">Cada seleção escolhe uma bandeira, monta seu elenco e desenvolve uma <b style="color:#fff">proposta de inovação aplicável à Revvo</b>, conectada a um dos nossos valores. A ideia precisa resolver um problema real e ser viável de colocar em prática — quanto mais fácil de aplicar e maior o impacto, mais forte o projeto. Tudo é defendido em um pitch de até 3 minutos.</p>
+      <p style="line-height:1.6;margin-top:10px;font-family:'Barlow Condensed';font-size:19px;color:var(--amarelo)"><b>O gol? Será por votação da torcida! ⚽</b></p>
+    </div>
+    <div class="tabpane" id="tab-regras">
+      <ul>
+        <li>Cada <b>seleção</b> (ou time) é uma equipe de <b>5 a 15 participantes</b> com um projeto de inovação.</li>
+        <li>Capitão (Mentor Técnico) único — cada pessoa só pode liderar uma equipe.</li>
+        <li>No sorteio, as seleções são distribuídas em <b>4 grupos</b> (A, B, C e D). Um <b>grupo</b> é o conjunto de seleções que disputam entre si — vence 1 seleção por grupo.</li>
+        <li>Iniciativas enviadas fora do prazo são desconsideradas.</li>
+      </ul>
+      <h3 style="margin-top:16px">Como funciona a votação</h3>
+      <p style="color:var(--txt2);line-height:1.6"><b style="color:#fff">Fase de grupos (17 a 22/07) — quem vota é a torcida.</b> Cada grupo é decidido no seu dia: 17/07 = Grupo A, 20/07 = Grupo B, 21/07 = Grupo C, 22/07 = Grupo D. Todos os colaboradores podem votar nas propostas do grupo do dia, e as seleções podem mobilizar sua torcida — cada voto é um gol! A seleção mais votada de cada grupo avança como vencedora.</p>
+      <p style="color:var(--txt2);line-height:1.6;margin-top:8px"><b style="color:#fff">Grande Final (23 a 28/07) — quem decide é a Diretoria.</b> As 4 vencedoras de grupo apresentam seus projetos à Diretoria, que escolhe a campeã em <b>votação secreta</b>, na reunião de encerramento. Nesta etapa, o painel mostra as finalistas apenas para acompanhamento — não há votação aberta.</p>
+    </div>
+    <div class="tabpane" id="tab-premio">
+      <div class="premio"><span class="ic">🏅</span><span><b>Premiação Glória eterna:</b> o nome da seleção campeã entra para a história da Revvo.</span></div>
+      <div class="premio"><span class="ic">🎁</span><span><b>Kit personalizado Revvo</b> para cada integrante do time campeão.</span></div>
+      <div class="premio"><span class="ic">🌴</span><span><b>1 dia de folga</b> por participante do time campeão (a combinar com a gestão).</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== TELA 1 — INSCRIÇÃO ===================== -->
+<section class="screen" id="scr-inscricao">
+  <button class="back" data-go="home">← Voltar</button>
+  <div class="card">
+    <h2>Convocação da seleção</h2>
+    <p style="color:var(--txt2)">Inscreva seu time para entrar em campo (16–20/06). Dá para registrar mais de uma seleção em sequência.</p>
+    <label for="iSelecao">Nome da seleção</label>
+    <input id="iSelecao" placeholder="Ex.: Seleção Revvolucionária">
+    <label for="iMentor">Mentor Técnico (Capitão)</label>
+    <input id="iMentor" placeholder="Nome do mentor — só pode liderar uma equipe">
+    <label>Jogadores convocados (5 a 15) — nome, setor e e-mail</label>
+    <div id="inscPlayers"></div>
+    <button class="btn sec mini" id="btnAddInscPlayer" style="margin-top:10px">+ Convocar jogador</button>
+    <br>
+    <button class="btn" id="btnInscrever">Confirmar convocação ⚽</button>
+    <div class="banner" id="bannerInscricao">✅ Seleção convocada! Bom treinamento — o sorteio dos grupos sai em 15/07. Pode registrar a próxima.</div>
+  </div>
+</section>
+
+<!-- ===================== TELA 2 — PITCH ===================== -->
+<section class="screen" id="scr-pitch">
+  <button class="back" data-go="home">← Voltar</button>
+  <div class="card">
+    <h2>Enviar pitch da seleção</h2>
+
+    <label for="pNome">Nome da seleção</label>
+    <input id="pNome" placeholder="Ex.: Seleção Revvolucionária">
+
+    <h3>Proposta de inovação</h3>
+    <label>Valor da Revvo conectado</label>
+    <div class="chips" id="valoresChips"></div>
+    <label for="pTitulo">Título da proposta</label>
+    <input id="pTitulo" placeholder="Nome da ideia">
+    <label for="pProblema">Qual problema da Revvo isso resolve?</label>
+    <textarea id="pProblema" rows="3" placeholder="A dor ou oportunidade que a ideia ataca"></textarea>
+    <label for="pAplicar">Como seria aplicado na prática?</label>
+    <textarea id="pAplicar" rows="3" placeholder="Como funcionaria no dia a dia e qual o impacto esperado"></textarea>
+
+    <h3>Vídeo do pitch (até 3 min)</h3>
+    <label for="pUrl">Link do vídeo (YouTube / OneDrive / Drive)</label>
+    <input id="pUrl" placeholder="https://…">
+
+    <button class="btn" id="btnPitch">Enviar pitch 🎤</button>
+    <div class="banner" id="bannerPitch">✅ Pitch recebido! Boa sorte na votação — cada voto é um gol! ⚽</div>
+  </div>
+</section>
+
+<!-- ===================== TELA 3 — CHAVE ===================== -->
+<section class="screen" id="scr-chave">
+  <button class="back" data-go="home">← Voltar</button>
+  <div class="card" id="chaveLock">
+    <div class="lock"><div class="ic">🔒</div>
+      <h2>Sorteio ainda não realizado</h2>
+      <p style="color:var(--txt2)">Aguarde a administradora realizar o sorteio dos 4 grupos em 15/07.</p>
+      <button class="btn sec" data-go="home">Voltar</button>
+    </div>
+  </div>
+  <div id="chaveContent" style="display:none">
+    <div class="card"><h2>Os 4 grupos</h2><div class="groups" id="groupsGrid"></div></div>
+    <div class="card" id="championCard" style="display:none"></div>
+  </div>
+</section>
+
+<!-- ===================== TELA 4 — VOTAÇÃO / TELA 5 — MATCH ===================== -->
+<section class="screen" id="scr-votar">
+  <button class="back" data-go="home">← Voltar</button>
+
+  <div class="card" id="voteLock">
+    <div class="lock"><div class="ic">🗳️</div>
+      <h2>Votação ainda não liberada</h2>
+      <p style="color:var(--txt2)">Aguarde o período de 17 a 22 de julho. Cada voto é um gol!</p>
+      <button class="btn sec" data-go="home">Voltar</button>
+    </div>
+  </div>
+
+  <!-- votação geral -->
+  <div class="card" id="voteGeneral" style="display:none">
+    <h2>Votação geral</h2>
+    <p style="color:var(--txt2)">Vote na proposta que mais merece levantar a taça. Um voto por pessoa (dá para mudar até o fim do período).</p>
+    <div id="voteList"></div>
+  </div>
+
+  <!-- tela 5: match vote -->
+  <div id="voteMatch" style="display:none">
+    <div class="card">
+      <h2 id="matchTitle">Confronto do dia</h2>
+      <div class="placar"><span id="scoreA">0</span><small style="font-size:20px;color:var(--txt2)">×</small><span id="scoreB">0</span></div>
+      <div class="votebar" style="margin-bottom:18px"><i id="matchBar" style="width:50%"></i></div>
+      <div class="duel">
+        <div class="prop" id="propA"></div>
+        <div class="meio">VS</div>
+        <div class="prop" id="propB"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- confirmação de voto -->
+  <div class="card" id="voteDone" style="display:none">
+    <div class="lock">
+      <div class="ic">⚽</div>
+      <h2 style="color:var(--verde)">GOL! Seu voto foi computado</h2>
+      <p style="color:var(--txt2)" id="voteDoneMsg"></p>
+      <div id="voteDoneActions" style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:18px"></div>
+    </div>
+  </div>
+
+  <!-- grande final (apenas exibição) -->
+  <div id="voteFinal" style="display:none">
+    <div class="card">
+      <div style="text-align:center">
+        <div style="font-size:48px">🏆</div>
+        <h2 style="color:var(--amarelo)">GRANDE FINAL · AS 4 FINALISTAS</h2>
+        <p style="color:var(--txt2);max-width:560px;margin:0 auto">As quatro seleções campeãs de grupo chegaram à final. Agora a decisão é da <b>Diretoria</b>, em votação secreta na reunião de encerramento. Boa sorte a todas! 🍀</p>
+      </div>
+      <div class="finalists-grid" id="finalistsGrid"></div>
+      <div id="championBanner"></div>
+    </div>
+  </div>
+</section>
+
+<footer>Copa Revvo de Inovação 2026 · Gente &amp; Gestão</footer>
+</div>
+
+<script>
+/* =========================================================
+   CONFIG
+========================================================= */
+const DB = "https://copa-revvo-default-rtdb.firebaseio.com";
+
+/* Logo Revvo: cole aqui o base64 do PNG branco (fundo preto).
+   Enquanto estiver vazio, é exibido o wordmark "REVVO" em texto. */
+const REVVO_LOGO_B64 = "";
+
+/* 8 valores oficiais da Revvo */
+const VALORES = ["Valorizar a diversidade","Ser um eterno aprendiz","Honrar seus compromissos",
+                 "Colaborar para que o time seja maior que o indivíduo","Ter compromisso com o resultado do cliente",
+                 "Atuar com mentalidade inovadora","Tomar decisões baseadas em dados","Ser eficiente nas suas ações"];
+
+/* dia de votação de cada chave em julho */
+const DIA_CHAVE = {A:17, B:20, C:21, D:22};
+
+/* =========================================================
+   HELPERS
+========================================================= */
+const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+const fb = {
+  get: p => fetch(`${DB}/${p}.json`).then(r=>r.json()),
+  put: (p,v) => fetch(`${DB}/${p}.json`,{method:"PUT",body:JSON.stringify(v)}).then(r=>r.json()),
+  patch:(p,v)=> fetch(`${DB}/${p}.json`,{method:"PATCH",body:JSON.stringify(v)}).then(r=>r.json())
+};
+const uid = localStorage.copa_uid || (localStorage.copa_uid = "u"+Math.random().toString(36).slice(2,11));
+const esc = s => String(s??"").replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const COLORS = ["#FF6000","#FFD200","#00BAFF","#006BFF","#00D17A"];
+
+let phase = "pre", teams = {}, bracket = null;
+
+/* logo */
+if (REVVO_LOGO_B64){ $("#logoImg").src = REVVO_LOGO_B64; $("#logoImg").style.display="block"; $("#logoTxt").style.display="none"; }
+
+/* =========================================================
+   NAVEGAÇÃO + ABAS
+========================================================= */
+function go(id){
+  if(typeof matchPoll!=="undefined") clearInterval(matchPoll);
+  $$(".screen").forEach(s=>s.classList.remove("on"));
+  $("#scr-"+id).classList.add("on");
+  $$(".pill").forEach(p=>p.classList.toggle("on", p.dataset.go===id));
+  window.scrollTo({top:0,behavior:"smooth"});
+  if(id==="chave") renderChave();
+  if(id==="votar") renderVotar();
+}
+document.addEventListener("click", e=>{
+  const g = e.target.closest("[data-go]"); if(g) go(g.dataset.go);
+  const t = e.target.closest(".tab");
+  if(t){ $$(".tab").forEach(x=>x.classList.remove("on")); t.classList.add("on");
+    $$(".tabpane").forEach(x=>x.classList.remove("on")); $("#tab-"+t.dataset.tab).classList.add("on"); }
+});
+
+/* =========================================================
+   TELA 1 — CONVOCAÇÃO DA SELEÇÃO
+========================================================= */
+$("#btnInscrever").onclick = async ()=>{
+  const selecao=$("#iSelecao").value.trim(), mentor=$("#iMentor").value.trim();
+  const players=$$("#inscPlayers .player-row").map(r=>({
+    nome:r.querySelector(".pl-nome").value.trim(),
+    setor:r.querySelector(".pl-setor").value.trim(),
+    email:r.querySelector(".pl-email").value.trim()
+  })).filter(p=>p.nome||p.setor||p.email);
+  if(!selecao||!mentor) return alert("Preencha o nome da seleção e o mentor.");
+  if(players.length<5||players.length>15) return alert("A seleção precisa ter de 5 a 15 jogadores.");
+  for(const p of players){
+    if(!p.nome||!p.setor||!p.email) return alert("Cada jogador precisa de nome, setor e e-mail.");
+    if(!/^\S+@\S+\.\S+$/.test(p.email)) return alert(`E-mail inválido: ${p.nome||p.email}`);
+  }
+
+  $("#btnInscrever").disabled = true;
+  const all = await fb.get("copa_inscricoes") || {};
+  const dupSel = Object.values(all).some(t=>(t.selecao||"").toLowerCase()===selecao.toLowerCase());
+  const dupMentor = Object.values(all).some(t=>(t.mentor||"").toLowerCase()===mentor.toLowerCase());
+  if(dupSel){ $("#btnInscrever").disabled=false; return alert("Já existe uma seleção com esse nome."); }
+  if(dupMentor){ $("#btnInscrever").disabled=false; return alert("Esse mentor já lidera outra equipe — cada mentor só pode liderar uma."); }
+
+  const id = "i"+Date.now()+Math.random().toString(36).slice(2,6);
+  await fb.put(`copa_inscricoes/${id}`, {selecao,mentor,players,createdAt:new Date().toISOString()});
+  $("#btnInscrever").disabled = false;
+  ["iSelecao","iMentor"].forEach(i=>$("#"+i).value="");
+  $("#inscPlayers").innerHTML=""; for(let i=0;i<5;i++) addInscPlayerRow();
+  flash("#bannerInscricao");
+  $("#iSelecao").focus();
+};
+function flash(sel){ const b=$(sel); b.classList.add("show"); setTimeout(()=>b.classList.remove("show"),4000); }
+
+/* =========================================================
+   TELA 2 — PITCH
+========================================================= */
+let selValor = null;
+
+$("#valoresChips").innerHTML = VALORES.map(v=>`<button type="button" class="chip">${v}</button>`).join("");
+$("#valoresChips").addEventListener("click", e=>{
+  const c=e.target.closest(".chip"); if(!c) return;
+  selValor=c.textContent; $$(".chip").forEach(x=>x.classList.toggle("on",x===c));
+});
+
+/* linha de jogador da convocação: nome + setor + e-mail */
+function addInscPlayerRow(p={}){
+  const div=document.createElement("div"); div.className="player-row pl-multi";
+  div.innerHTML=`<input class="pl-nome" placeholder="Nome" value="${esc(p.nome||"")}">
+    <input class="pl-setor" placeholder="Setor" value="${esc(p.setor||"")}">
+    <input class="pl-email" type="email" placeholder="E-mail" value="${esc(p.email||"")}">
+    <button type="button" title="Remover">✕</button>`;
+  div.querySelector("button").onclick=()=>div.remove();
+  $("#inscPlayers").appendChild(div);
+}
+$("#btnAddInscPlayer").onclick=()=>addInscPlayerRow();
+for(let i=0;i<5;i++) addInscPlayerRow();
+
+/* sigla de 3 letras gerada a partir do nome da seleção */
+const siglaDe = name => (name.replace(/[^A-Za-zÀ-ú]/g,"").toUpperCase()+"XXX").slice(0,3);
+
+$("#btnPitch").onclick = async ()=>{
+  const name=$("#pNome").value.trim();
+  const titulo=$("#pTitulo").value.trim();
+  const problema=$("#pProblema").value.trim(), aplicar=$("#pAplicar").value.trim();
+  const url=$("#pUrl").value.trim();
+  if(!name) return alert("Informe o nome da seleção.");
+  if(!selValor) return alert("Selecione o valor da Revvo conectado à proposta.");
+  if(!titulo) return alert("Dê um título à proposta.");
+  if(!problema||!aplicar) return alert("Preencha o problema que a ideia resolve e como ela seria aplicada.");
+  if(!url) return alert("Envie o link do vídeo (YouTube, OneDrive ou Drive).");
+
+  $("#btnPitch").disabled = true;
+  const [all, inscricoes] = await Promise.all([fb.get("copa_teams"), fb.get("copa_inscricoes")]);
+  const teamsAll = all || {};
+  /* nome único por seleção: atualiza se já existir */
+  let id = Object.keys(teamsAll).find(k => teamsAll[k].name.toLowerCase() === name.toLowerCase());
+  if(!id) id = "t"+Date.now()+Math.random().toString(36).slice(2,6);
+  /* puxa mentor e elenco da convocação, se a seleção estiver convocada */
+  const conv = Object.values(inscricoes||{}).find(t=>(t.selecao||"").toLowerCase()===name.toLowerCase());
+  const convPlayers = (conv?.players||[]).map(p=> typeof p==="string"? p : p.nome).filter(Boolean);
+  const detail = `Problema: ${problema}\n\nComo aplicar: ${aplicar}`;
+
+  const team = {id, flag:siglaDe(name), name, coach:conv?.mentor||teamsAll[id]?.coach||"",
+                players:convPlayers.length?convPlayers:teamsAll[id]?.players||[], valor:selValor, proposal:titulo,
+                problema, aplicar, detail, url, createdAt: teamsAll[id]?.createdAt || new Date().toISOString()};
+  await fb.put(`copa_teams/${id}`, team);
+  await fb.put(`copa_pitches/${id}`, {team:name, url, valor:selValor, proposal:titulo, submittedAt:new Date().toISOString()});
+  $("#btnPitch").disabled = false;
+  flash("#bannerPitch");
+};
+
+/* =========================================================
+   TELA 3 — CHAVE
+========================================================= */
+async function loadData(){
+  [teams, bracket, phase] = await Promise.all([fb.get("copa_teams"), fb.get("copa_bracket"), fb.get("copa_phase")]);
+  teams = teams || {}; phase = phase || "pre";
+}
+const teamTag = (t, win=false) => t
+  ? `<div class="mteam${win?" win":""}"><span class="sig" style="color:${COLORS[(t.flag||"").charCodeAt(0)%5]}">${esc(t.flag)}</span>${esc(t.name)}${win?" 🏆":""}</div>`
+  : `<div class="mteam"><span class="sig">—</span><i style="color:var(--txt2)">bye / a definir</i></div>`;
+
+async function renderChave(){
+  await loadData();
+  const has = bracket && bracket.groups;
+  $("#chaveLock").style.display = has ? "none":"block";
+  $("#chaveContent").style.display = has ? "block":"none";
+  if(!has) return;
+  const matches = bracket.matches || {};
+  $("#groupsGrid").innerHTML = ["A","B","C","D"].map(g=>{
+    const ids = bracket.groups[g] || [];
+    const gm = Object.entries(matches).filter(([k,m])=>m.g===g).sort((a,b)=>a[1].r-b[1].r);
+    const fin = bracket.finalists?.[g];
+    return `<div class="group g${g}"><h3>Grupo ${g} <small style="font-size:13px;color:var(--txt2)">· votação dia ${DIA_CHAVE[g]}/07</small></h3>
+      ${ids.map(i=>teamTag(teams[i])).join("")}
+      ${gm.map(([k,m])=>`<div class="match"><small>Rodada ${m.r}${bracket.currentMatch===k?" · 🔴 EM VOTAÇÃO":""}</small>
+        ${teamTag(teams[m.a], m.winner===m.a)}<div class="vs">VS</div>${teamTag(teams[m.b], m.winner===m.b)}</div>`).join("")}
+      ${fin?`<div class="finalista">⭐ Finalista: ${esc(teams[fin]?.name||"")}</div>`:""}
+    </div>`;
+  }).join("");
+  if(bracket.champion && teams[bracket.champion]){
+    const c = teams[bracket.champion];
+    $("#championCard").style.display="block";
+    $("#championCard").innerHTML = `<div class="lock"><div class="ic">🏆</div><h2 style="color:var(--amarelo)">CAMPEÃ: ${esc(c.name)}</h2>
+      <p style="color:var(--txt2)">${esc(c.proposal)} · Capitão: ${esc(c.coach)}</p></div>`;
+  } else $("#championCard").style.display="none";
+}
+
+/* =========================================================
+   TELAS 4 e 5 — VOTAÇÃO
+========================================================= */
+function videoEmbed(url){
+  if(!url) return "";
+  if(url.startsWith("data:")) return `<video controls src="${url}"></video>`;
+  const yt = url.match(/(?:youtube\.com\/.*[?&]v=|youtu\.be\/)([\w-]{6,})/);
+  if(yt) return `<iframe src="https://www.youtube.com/embed/${yt[1]}" allowfullscreen title="Pitch"></iframe>`;
+  return `<a class="btn sec mini" href="${esc(url)}" target="_blank" rel="noopener">▶ Assistir pitch</a>`;
+}
+
+async function renderVotar(){
+  await loadData();
+  const lock=$("#voteLock"), gen=$("#voteGeneral"), mat=$("#voteMatch"), done=$("#voteDone"), fin=$("#voteFinal");
+  lock.style.display=gen.style.display=mat.style.display=done.style.display=fin.style.display="none";
+
+  if((phase==="final"||phase==="fim") && bracket){
+    fin.style.display="block"; renderFinal();
+  } else if(phase==="match" && bracket?.currentMatch && bracket.matches?.[bracket.currentMatch]){
+    mat.style.display="block"; renderMatch(bracket.currentMatch);
+  } else if(phase==="vote"){
+    gen.style.display="block"; renderGeneral();
+  } else lock.style.display="block";
+}
+
+/* grande final — apenas exibição, decisão da diretoria é presencial e secreta */
+function renderFinal(){
+  const fins = bracket.finalists || {};
+  const champ = bracket.champion;
+  $("#finalistsGrid").innerHTML = ["A","B","C","D"].map(g=>{
+    const t = teams[fins[g]];
+    if(!t) return `<div class="fcard"><div class="chave">Grupo ${g}</div><div class="sig">—</div><h3 style="color:var(--txt2)">A definir</h3></div>`;
+    return `<div class="fcard${champ===t.id?" champ":""}">
+      <div class="chave">Campeã do Grupo ${g}</div>
+      <div class="sig">${esc(t.flag)}</div>
+      <h3>${esc(t.name)}</h3>
+      <p class="relato"><b>${esc(t.proposal||"")}</b><br>${esc(t.valor||"")}</p>
+    </div>`;
+  }).join("");
+  $("#championBanner").innerHTML = (champ && teams[champ])
+    ? `<div class="champ-banner">🏆 CAMPEÃ DA COPA REVVO 2026<br>${esc(teams[champ].name)}</div>`
+    : `<p style="text-align:center;color:var(--txt2);margin-top:20px">Aguardando a decisão da Diretoria na reunião de encerramento…</p>`;
+  if(champ && teams[champ]) confetti();
+}
+
+async function renderGeneral(){
+  const votes = await fb.get("copa_votes/general") || {};
+  const count={}; Object.values(votes).forEach(t=>count[t]=(count[t]||0)+1);
+  const total=Object.values(votes).length||1;
+  const mine=votes[uid];
+  $("#voteList").innerHTML = Object.values(teams).sort((a,b)=>(count[b.id]||0)-(count[a.id]||0)).map(t=>`
+    <div class="voterow">
+      <div class="top">
+        <div>${teamTag(t)}<small style="color:var(--txt2)">${esc(t.proposal||"")}</small></div>
+        <div style="text-align:right"><div class="gols">${count[t.id]||0} ⚽</div>
+          <button class="btn mini ${mine===t.id?"":"sec"}" onclick="voteGeneral('${t.id}')">${mine===t.id?"Seu voto ✔":"Votar"}</button></div>
+      </div>
+      <div class="votebar"><i style="width:${(count[t.id]||0)/total*100}%"></i></div>
+    </div>`).join("") || "<p style='color:var(--txt2)'>Nenhuma seleção com pitch enviado ainda.</p>";
+}
+window.voteGeneral = async id=>{ await fb.put(`copa_votes/general/${uid}`, id); confetti(); showVoteDone({tipo:"general", votadoEm:null, time:teams[id]?.name||""}); };
+
+let matchPoll=null;
+async function renderMatch(key){
+  clearInterval(matchPoll);
+  const m = bracket.matches[key], A=teams[m.a], B=teams[m.b];
+  $("#matchTitle").textContent = `Grupo ${m.g} · Rodada ${m.r} — ${A?.name||"?"} × ${B?.name||"?"}`;
+  const propHTML = (t,side)=>`
+    <h3 style="color:${side==="a"?"var(--ciano)":"var(--laranja)"}">${esc(t.flag)} · ${esc(t.name)}</h3>
+    <p class="relato"><b>${esc(t.proposal)}</b> · valor: ${esc(t.valor)}<br>
+      ${t.problema?`<b>Problema:</b> ${esc(t.problema)}<br><b>Como aplicar:</b> ${esc(t.aplicar||"")}`:esc(t.detail||"")}</p>
+    ${videoEmbed(t.url)}
+    <button class="btn" style="width:100%" onclick="voteMatch('${key}','${t.id}')">${esc(t.name)} é melhor ⚽</button>`;
+  $("#propA").innerHTML = A?propHTML(A,"a"):""; $("#propB").innerHTML = B?propHTML(B,"b"):"";
+  const update = async ()=>{
+    const v = await fb.get(`copa_votes/${key}`) || {};
+    const ca=Object.values(v).filter(x=>x===m.a).length, cb=Object.values(v).filter(x=>x===m.b).length;
+    $("#scoreA").textContent=ca; $("#scoreB").textContent=cb;
+    $("#matchBar").style.width = (ca+cb? ca/(ca+cb)*100 : 50)+"%";
+  };
+  update(); matchPoll=setInterval(update, 5000);
+}
+window.voteMatch = async (key,id)=>{
+  await fb.put(`copa_votes/${key}/${uid}`, id);
+  confetti();
+  showVoteDone({tipo:"match", votadoEm:key, time:teams[id]?.name||""});
+};
+
+/* tela de confirmação: voto computado + próximo jogo votável (se houver) */
+async function showVoteDone({tipo, votadoEm, time}){
+  clearInterval(matchPoll);
+  await loadData();
+  $("#voteLock").style.display=$("#voteGeneral").style.display=$("#voteMatch").style.display="none";
+
+  /* procura o próximo confronto da fase de jogos que esta pessoa ainda não votou */
+  let proximo=null;
+  if(bracket?.matches){
+    for(const [k,m] of Object.entries(bracket.matches)){
+      if(m.winner || !m.b) continue;            /* já decidido ou bye */
+      if(k===votadoEm) continue;                /* o que acabou de votar */
+      const v = await fb.get(`copa_votes/${k}`) || {};
+      if(v[uid]) continue;                       /* já votou neste */
+      proximo={key:k, m};
+      if(k===bracket.currentMatch) break;        /* prioriza o jogo ativo */
+    }
+  }
+
+  const done=$("#voteDone"); done.style.display="block";
+  $("#voteDoneMsg").innerHTML = time
+    ? `Você votou em <b style="color:var(--amarelo)">${esc(time)}</b>. Pode mudar seu voto enquanto a votação estiver aberta.`
+    : "Obrigada por participar da torcida!";
+  window.scrollTo({top:0,behavior:"smooth"});
+
+  const acts=$("#voteDoneActions"); acts.innerHTML="";
+  if(proximo){
+    const A=teams[proximo.m.a]?.name||"?", B=teams[proximo.m.b]?.name||"?";
+    const b=document.createElement("button");
+    b.className="btn"; b.innerHTML=`Próximo jogo: ${esc(A)} × ${esc(B)} ⚽`;
+    b.onclick=()=>{ $("#voteDone").style.display="none"; $("#voteMatch").style.display="block"; renderMatch(proximo.key); window.scrollTo({top:0,behavior:"smooth"}); };
+    acts.appendChild(b);
+  } else {
+    const msg=document.createElement("p");
+    msg.style.cssText="color:var(--txt2);width:100%";
+    msg.textContent="Você já votou em todos os confrontos abertos. Volte quando a administração liberar o próximo jogo!";
+    acts.appendChild(msg);
+  }
+  const rever=document.createElement("button");
+  rever.className="btn sec";
+  rever.textContent= tipo==="match" ? "Rever este confronto" : "Voltar à votação";
+  rever.onclick=()=>{ done.style.display="none";
+    if(tipo==="match"){ $("#voteMatch").style.display="block"; renderMatch(votadoEm); }
+    else { $("#voteGeneral").style.display="block"; renderGeneral(); }
+    window.scrollTo({top:0,behavior:"smooth"}); };
+  acts.appendChild(rever);
+
+  const home=document.createElement("button");
+  home.className="btn sec"; home.textContent="Ir para o início";
+  home.onclick=()=>go("home"); acts.appendChild(home);
+}
+
+/* =========================================================
+   CONFETE
+========================================================= */
+function confetti(){
+  const cols=[...COLORS,"#fff"];
+  for(let i=0;i<70;i++){
+    const c=document.createElement("div"); c.className="confetti";
+    const s=6+Math.random()*8;
+    c.style.cssText=`left:${Math.random()*100}vw;width:${s}px;height:${s*1.4}px;background:${cols[i%cols.length]};
+      transform:rotate(${Math.random()*360}deg);transition:transform ${2+Math.random()*1.5}s ease-in, top ${2+Math.random()*1.5}s ease-in;`;
+    document.body.appendChild(c);
+    requestAnimationFrame(()=>{ c.style.top="110vh"; c.style.transform=`rotate(${720+Math.random()*720}deg)`; });
+    setTimeout(()=>c.remove(), 4000);
+  }
+}
+
+/* polling leve (fase + jogo ativo) — atualiza telas automaticamente */
+let lastMatch=null;
+setInterval(async ()=>{
+  const [p,cm] = await Promise.all([fb.get("copa_phase"), fb.get("copa_bracket/currentMatch")]);
+  const changed = (p && p!==phase) || cm!==lastMatch;
+  phase = p || phase; lastMatch = cm;
+  if(changed){
+    if($("#scr-votar").classList.contains("on")) renderVotar();
+    if($("#scr-chave").classList.contains("on")) renderChave();
+  }
+}, 8000);
+</script>
+</body>
+</html>
