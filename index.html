@@ -258,8 +258,8 @@ footer{text-align:center;color:rgba(255,255,255,.35);font-size:13px;margin-top:5
     <div class="chips" id="valoresChips"></div>
     <label for="pTitulo">Título da proposta</label>
     <input id="pTitulo" placeholder="Nome da ideia">
-    <label for="pProblema">Qual problema da Revvo isso resolve?</label>
-    <textarea id="pProblema" rows="3" placeholder="A dor ou oportunidade que a ideia ataca"></textarea>
+    <label for="pMelhoria">Qual melhoria esta proposta resolve diretamente?</label>
+    <textarea id="pMelhoria" rows="3" placeholder="A dor ou oportunidade que a ideia ataca"></textarea>
     <label for="pAplicar">Como seria aplicado na prática?</label>
     <textarea id="pAplicar" rows="3" placeholder="Como funcionaria no dia a dia e qual o impacto esperado"></textarea>
 
@@ -452,12 +452,12 @@ const siglaDe = name => (name.replace(/[^A-Za-zÀ-ú]/g,"").toUpperCase()+"XXX")
 $("#btnPitch").onclick = async ()=>{
   const name=$("#pNome").value.trim();
   const titulo=$("#pTitulo").value.trim();
-  const problema=$("#pProblema").value.trim(), aplicar=$("#pAplicar").value.trim();
+  const melhoria=$("#melhoria").value.trim(), aplicar=$("#pAplicar").value.trim();
   const url=$("#pUrl").value.trim();
   if(!name) return alert("Informe o nome da seleção.");
   if(!selValor) return alert("Selecione o valor da Revvo conectado à proposta.");
   if(!titulo) return alert("Dê um título à proposta.");
-  if(!problema||!aplicar) return alert("Preencha o problema que a ideia resolve e como ela seria aplicada.");
+  if(!melhoria||!aplicar) return alert("Preencha a melhoria que a ideia resolve e como ela seria aplicada.");
   if(!url) return alert("Envie o link do vídeo (YouTube, OneDrive ou Drive).");
 
   $("#btnPitch").disabled = true;
@@ -469,11 +469,11 @@ $("#btnPitch").onclick = async ()=>{
   /* puxa mentor e elenco da convocação, se a seleção estiver convocada */
   const conv = Object.values(inscricoes||{}).find(t=>(t.selecao||"").toLowerCase()===name.toLowerCase());
   const convPlayers = (conv?.players||[]).map(p=> typeof p==="string"? p : p.nome).filter(Boolean);
-  const detail = `Problema: ${problema}\n\nComo aplicar: ${aplicar}`;
+  const detail = `Melhoria: ${melhoria}\n\nComo aplicar: ${aplicar}`;
 
   const team = {id, flag:siglaDe(name), name, coach:conv?.mentor||teamsAll[id]?.coach||"",
                 players:convPlayers.length?convPlayers:teamsAll[id]?.players||[], valor:selValor, proposal:titulo,
-                problema, aplicar, detail, url, createdAt: teamsAll[id]?.createdAt || new Date().toISOString()};
+                melhoria, aplicar, detail, url, createdAt: teamsAll[id]?.createdAt || new Date().toISOString()};
   await fb.put(`copa_teams/${id}`, team);
   await fb.put(`copa_pitches/${id}`, {team:name, url, valor:selValor, proposal:titulo, submittedAt:new Date().toISOString()});
   $("#btnPitch").disabled = false;
