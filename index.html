@@ -72,6 +72,14 @@ h1{font-size:clamp(44px,7vw,76px);line-height:.95;
   background:linear-gradient(135deg,var(--amarelo),var(--laranja));box-shadow:0 0 0 5px rgba(8,8,8,.6)}
 .tl b{display:block;font-family:'Barlow Condensed';font-size:19px;text-transform:uppercase;letter-spacing:.05em;color:var(--amarelo)}
 .tl span{color:var(--txt2);font-size:15px;line-height:1.45}
+/* etapa apagada (não-atual) */
+.tl li.dim{opacity:.4}
+.tl li.dim::before{background:rgba(255,255,255,.12);color:rgba(255,255,255,.5);box-shadow:0 0 0 5px rgba(8,8,8,.6)}
+.tl li.dim b{color:rgba(255,255,255,.55)}
+.tl li.dim span{color:rgba(255,255,255,.35)}
+/* etapa atual em destaque */
+.tl li.atual::before{box-shadow:0 0 0 5px rgba(8,8,8,.6), 0 0 18px rgba(255,210,0,.6)}
+.tl li.atual b{color:var(--laranja)}
 .final-call{margin-top:20px;padding:18px 22px;border-radius:14px;text-align:center;
   font-family:'Bebas Neue';font-size:clamp(20px,3.4vw,30px);letter-spacing:.08em;color:#080808;
   background:linear-gradient(90deg,var(--amarelo),var(--laranja));
@@ -186,12 +194,12 @@ footer{text-align:center;color:rgba(255,255,255,.35);font-size:13px;margin-top:5
   <div class="card">
     <h2>Calendário do torneio</h2>
     <ol class="tl">
-      <li><b>17–25 Jun · Convocação das seleções</b><span>Inscrição dos times e escolha do Mentor Técnico (que só poderá liderar uma equipe) para entrar em campo.</span></li>
-      <li><b>26 Jun · Sorteio dos Grupos (A e B)</b><span>As seleções inscritas são sorteadas em dois grupos.</span></li>
-      <li><b>26 Jun – 30 Jul · Preparação e treino</b><span>O time se organiza, escolhe o projeto e desenvolve a proposta de inovação.</span></li>
-      <li><b>31 Jul · Envio dos projetos</b><span>Entrega do pitch de até 3 minutos apresentando a proposta.</span></li>
-      <li><b>03–05 Ago · Votação dos grupos</b><span>A torcida decide! Todos os colaboradores votam nas seleções e podem pedir votos — cada voto é um gol. Classificam-se os 2 mais votados de cada grupo.</span></li>
-      <li><b>06 Ago · Grande Final</b><span>Os 4 times com mais gols (2 de cada grupo) disputam o título diante da Diretoria, em votação secreta.</span></li>
+      <li class="dim"><b>17–22 Jun · Convocação das seleções</b><span>Inscrição dos times e escolha do Mentor Técnico (que só poderá liderar uma equipe) para entrar em campo.</span></li>
+      <li class="dim"><b>23 Jun · Sorteio dos Grupos (A e B)</b><span>As seleções inscritas são sorteadas em dois grupos.</span></li>
+      <li class="atual"><b>23 Jun – 30 Jul · Preparação e treino</b><span>O time se organiza, escolhe o projeto e desenvolve a proposta de inovação.</span></li>
+      <li class="dim"><b>31 Jul · Envio dos projetos</b><span>Entrega do pitch de até 3 minutos apresentando a proposta.</span></li>
+      <li class="dim"><b>03–05 Ago · Votação dos grupos</b><span>A torcida decide! Todos os colaboradores votam nas seleções e podem pedir votos — cada voto é um gol. Classificam-se os 2 mais votados de cada grupo.</span></li>
+      <li class="dim"><b>06 Ago · Grande Final</b><span>Os 4 times com mais gols (2 de cada grupo) disputam o título diante da Diretoria, em votação secreta.</span></li>
     </ol>
     <div class="final-call">🏆 <b>07 AGO</b> · DIVULGAÇÃO DO CAMPEÃO!</div>
   </div>
@@ -240,7 +248,7 @@ footer{text-align:center;color:rgba(255,255,255,.35);font-size:13px;margin-top:5
     <button class="btn sec mini" id="btnAddInscPlayer" style="margin-top:10px">+ Convocar jogador</button>
     <br>
     <button class="btn" id="btnInscrever">Confirmar convocação ⚽</button>
-    <div class="banner" id="bannerInscricao">✅ Seleção convocada! Bom treinamento — o sorteio dos grupos sai em 26/06. Pode registrar a próxima.</div>
+    <div class="banner" id="bannerInscricao">✅ Seleção convocada! Bom treinamento — o sorteio dos grupos sai em 15/07. Pode registrar a próxima.</div>
   </div>
 </section>
 
@@ -250,16 +258,16 @@ footer{text-align:center;color:rgba(255,255,255,.35);font-size:13px;margin-top:5
   <div class="card">
     <h2>Enviar pitch da seleção</h2>
 
-    <label for="pNome">Nome da seleção</label>
-    <input id="pNome" placeholder="Ex.: Seleção Revvolucionária">
+    <label for="pSelect">Sua seleção</label>
+    <select id="pSelect"><option value="">Carregando seleções…</option></select>
 
     <h3>Proposta de inovação</h3>
     <label>Valor da Revvo conectado</label>
     <div class="chips" id="valoresChips"></div>
     <label for="pTitulo">Título da proposta</label>
     <input id="pTitulo" placeholder="Nome da ideia">
-    <label for="pMelhoria">Qual melhoria esta proposta resolve diretamente?</label>
-    <textarea id="pMelhoria" rows="3" placeholder="A dor ou oportunidade que a ideia ataca"></textarea>
+    <label for="pProblema">Qual problema da Revvo isso resolve?</label>
+    <textarea id="pProblema" rows="3" placeholder="A dor ou oportunidade que a ideia ataca"></textarea>
     <label for="pAplicar">Como seria aplicado na prática?</label>
     <textarea id="pAplicar" rows="3" placeholder="Como funcionaria no dia a dia e qual o impacto esperado"></textarea>
 
@@ -278,7 +286,7 @@ footer{text-align:center;color:rgba(255,255,255,.35);font-size:13px;margin-top:5
   <div class="card" id="chaveLock">
     <div class="lock"><div class="ic">🔒</div>
       <h2>Sorteio ainda não realizado</h2>
-      <p style="color:var(--txt2)">Aguarde a administradora realizar o sorteio dos 4 grupos em 26/06.</p>
+      <p style="color:var(--txt2)">Aguarde a administradora realizar o sorteio dos 4 grupos em 15/07.</p>
       <button class="btn sec" data-go="home">Voltar</button>
     </div>
   </div>
@@ -380,6 +388,7 @@ function go(id){
   window.scrollTo({top:0,behavior:"smooth"});
   if(id==="chave") renderChave();
   if(id==="votar") renderVotar();
+  if(id==="pitch") carregarSelecoesPitch();
 }
 document.addEventListener("click", e=>{
   const g = e.target.closest("[data-go]"); if(g) go(g.dataset.go);
@@ -412,8 +421,14 @@ $("#btnInscrever").onclick = async ()=>{
   if(dupSel){ $("#btnInscrever").disabled=false; return alert("Já existe uma seleção com esse nome."); }
   if(dupMentor){ $("#btnInscrever").disabled=false; return alert("Esse mentor já lidera outra equipe — cada mentor só pode liderar uma."); }
 
-  const id = "i"+Date.now()+Math.random().toString(36).slice(2,6);
+  const id = "t"+Date.now()+Math.random().toString(36).slice(2,6);
+  const playerNames = players.map(p=>p.nome).filter(Boolean);
+  /* a convocação já cria a seleção que entra no sorteio (copa_teams);
+     o pitch depois só completa proposta/vídeo nesta mesma seleção. */
   await fb.put(`copa_inscricoes/${id}`, {selecao,mentor,players,createdAt:new Date().toISOString()});
+  await fb.put(`copa_teams/${id}`, {id, flag:siglaDe(selecao), name:selecao, coach:mentor,
+     players:playerNames, valor:"", proposal:"", problema:"", aplicar:"", detail:"", url:"",
+     pitchEnviado:false, createdAt:new Date().toISOString()});
   $("#btnInscrever").disabled = false;
   ["iSelecao","iMentor"].forEach(i=>$("#"+i).value="");
   $("#inscPlayers").innerHTML=""; for(let i=0;i<5;i++) addInscPlayerRow();
@@ -449,34 +464,41 @@ for(let i=0;i<5;i++) addInscPlayerRow();
 /* sigla de 3 letras gerada a partir do nome da seleção */
 const siglaDe = name => (name.replace(/[^A-Za-zÀ-ú]/g,"").toUpperCase()+"XXX").slice(0,3);
 
+/* popula o dropdown de seleções convocadas ao abrir a tela de pitch */
+async function carregarSelecoesPitch(){
+  const teamsAll = await fb.get("copa_teams") || {};
+  const lista = Object.values(teamsAll).sort((a,b)=>(a.name||"").localeCompare(b.name||""));
+  const sel = $("#pSelect");
+  if(!lista.length){ sel.innerHTML = '<option value="">Nenhuma seleção convocada ainda</option>'; return; }
+  sel.innerHTML = '<option value="">— Escolha sua seleção —</option>' +
+    lista.map(t=>`<option value="${t.id}">${esc(t.name)}${t.pitchEnviado?" (pitch já enviado)":""}</option>`).join("");
+}
+
 $("#btnPitch").onclick = async ()=>{
-  const name=$("#pNome").value.trim();
+  const id = $("#pSelect").value;
   const titulo=$("#pTitulo").value.trim();
-  const melhoria=$("#melhoria").value.trim(), aplicar=$("#pAplicar").value.trim();
+  const problema=$("#pProblema").value.trim(), aplicar=$("#pAplicar").value.trim();
   const url=$("#pUrl").value.trim();
-  if(!name) return alert("Informe o nome da seleção.");
+  if(!id) return alert("Escolha a sua seleção na lista.");
   if(!selValor) return alert("Selecione o valor da Revvo conectado à proposta.");
   if(!titulo) return alert("Dê um título à proposta.");
-  if(!melhoria||!aplicar) return alert("Preencha a melhoria que a ideia resolve e como ela seria aplicada.");
+  if(!problema||!aplicar) return alert("Preencha o problema que a ideia resolve e como ela seria aplicada.");
   if(!url) return alert("Envie o link do vídeo (YouTube, OneDrive ou Drive).");
 
   $("#btnPitch").disabled = true;
-  const [all, inscricoes] = await Promise.all([fb.get("copa_teams"), fb.get("copa_inscricoes")]);
-  const teamsAll = all || {};
-  /* nome único por seleção: atualiza se já existir */
-  let id = Object.keys(teamsAll).find(k => teamsAll[k].name.toLowerCase() === name.toLowerCase());
-  if(!id) id = "t"+Date.now()+Math.random().toString(36).slice(2,6);
-  /* puxa mentor e elenco da convocação, se a seleção estiver convocada */
-  const conv = Object.values(inscricoes||{}).find(t=>(t.selecao||"").toLowerCase()===name.toLowerCase());
-  const convPlayers = (conv?.players||[]).map(p=> typeof p==="string"? p : p.nome).filter(Boolean);
-  const detail = `Melhoria: ${melhoria}\n\nComo aplicar: ${aplicar}`;
-
-  const team = {id, flag:siglaDe(name), name, coach:conv?.mentor||teamsAll[id]?.coach||"",
-                players:convPlayers.length?convPlayers:teamsAll[id]?.players||[], valor:selValor, proposal:titulo,
-                melhoria, aplicar, detail, url, createdAt: teamsAll[id]?.createdAt || new Date().toISOString()};
+  const team = await fb.get(`copa_teams/${id}`);
+  if(!team){ $("#btnPitch").disabled=false; return alert("Seleção não encontrada. Recarregue a página."); }
+  const detail = `Problema: ${problema}\n\nComo aplicar: ${aplicar}`;
+  /* completa a seleção já existente com os dados do pitch */
+  Object.assign(team, {valor:selValor, proposal:titulo, problema, aplicar, detail, url, pitchEnviado:true});
   await fb.put(`copa_teams/${id}`, team);
-  await fb.put(`copa_pitches/${id}`, {team:name, url, valor:selValor, proposal:titulo, submittedAt:new Date().toISOString()});
+  await fb.put(`copa_pitches/${id}`, {team:team.name, url, valor:selValor, proposal:titulo, submittedAt:new Date().toISOString()});
   $("#btnPitch").disabled = false;
+  /* limpa campos e recarrega a lista (marca como enviado) */
+  ["pTitulo","pProblema","pAplicar","pUrl"].forEach(i=>$("#"+i).value="");
+  selValor=null; $$(".chip").forEach(x=>x.classList.remove("on"));
+  $("#pSelect").value="";
+  carregarSelecoesPitch();
   flash("#bannerPitch");
 };
 
@@ -594,7 +616,7 @@ async function renderGruposVote(){
       const t=teams[id]; if(!t) return "";
       return `<div class="voterow">
         <div class="top">
-          <div>${teamTag(t)}<small style="color:var(--txt2)">${esc(t.proposal||"")}</small></div>
+          <div>${teamTag(t)}<small style="color:var(--txt2)">${esc(t.proposal||"")||"<i>aguardando o envio do pitch</i>"}</small></div>
           <div style="text-align:right"><div class="gols">${count[id]||0} ⚽</div>
             <button class="btn mini ${mine===id?"":"sec"}" onclick="voteGrupo('${g}','${id}')">${mine===id?"Seu voto ✔":"Votar"}</button></div>
         </div>
