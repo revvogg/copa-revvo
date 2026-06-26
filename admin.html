@@ -376,7 +376,7 @@ function baixarCSV(lines, nome){
 /* ================= SORTEIO / CHAVES ================= */
 window.sorteio=async()=>{
   const ids=Object.keys(teams);
-  if(ids.length<4) return alert("É preciso ter pelo menos 4 seleções com pitch enviado para sortear.");
+  if(ids.length<2) return alert("É preciso ter pelo menos 2 seleções com pitch enviado para sortear.");
   if(bracket && !confirm("Já existe um sorteio. Refazer apaga os grupos e os votos. Continuar?")) return;
   /* embaralha */
   for(let i=ids.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [ids[i],ids[j]]=[ids[j],ids[i]]; }
