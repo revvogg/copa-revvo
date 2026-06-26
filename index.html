@@ -258,8 +258,8 @@ footer{text-align:center;color:rgba(255,255,255,.35);font-size:13px;margin-top:5
   <div class="card">
     <h2>Enviar pitch da seleção</h2>
 
-    <label for="pSelect">Sua seleção</label>
-    <select id="pSelect"><option value="">Carregando seleções…</option></select>
+    <label for="pNome">Nome da sua seleção</label>
+    <input id="pNome" placeholder="Digite exatamente o nome da seleção inscrita">
 
     <h3>Proposta de inovação</h3>
     <label>Valor da Revvo conectado</label>
@@ -388,7 +388,6 @@ function go(id){
   window.scrollTo({top:0,behavior:"smooth"});
   if(id==="chave") renderChave();
   if(id==="votar") renderVotar();
-  if(id==="pitch") carregarSelecoesPitch();
 }
 document.addEventListener("click", e=>{
   const g = e.target.closest("[data-go]"); if(g) go(g.dataset.go);
@@ -464,41 +463,46 @@ for(let i=0;i<5;i++) addInscPlayerRow();
 /* sigla de 3 letras gerada a partir do nome da seleção */
 const siglaDe = name => (name.replace(/[^A-Za-zÀ-ú]/g,"").toUpperCase()+"XXX").slice(0,3);
 
-/* popula o dropdown de seleções convocadas ao abrir a tela de pitch */
-async function carregarSelecoesPitch(){
-  const teamsAll = await fb.get("copa_teams") || {};
-  const lista = Object.values(teamsAll).sort((a,b)=>(a.name||"").localeCompare(b.name||""));
-  const sel = $("#pSelect");
-  if(!lista.length){ sel.innerHTML = '<option value="">Nenhuma seleção convocada ainda</option>'; return; }
-  sel.innerHTML = '<option value="">— Escolha sua seleção —</option>' +
-    lista.map(t=>`<option value="${t.id}">${esc(t.name)}${t.pitchEnviado?" (pitch já enviado)":""}</option>`).join("");
-}
-
 $("#btnPitch").onclick = async ()=>{
-  const id = $("#pSelect").value;
+  const nome = $("#pNome").value.trim();
   const titulo=$("#pTitulo").value.trim();
   const problema=$("#pProblema").value.trim(), aplicar=$("#pAplicar").value.trim();
   const url=$("#pUrl").value.trim();
-  if(!id) return alert("Escolha a sua seleção na lista.");
+  if(!nome) return alert("Digite o nome da sua seleção.");
   if(!selValor) return alert("Selecione o valor da Revvo conectado à proposta.");
   if(!titulo) return alert("Dê um título à proposta.");
   if(!problema||!aplicar) return alert("Preencha o problema que a ideia resolve e como ela seria aplicada.");
   if(!url) return alert("Envie o link do vídeo (YouTube, OneDrive ou Drive).");
 
   $("#btnPitch").disabled = true;
-  const team = await fb.get(`copa_teams/${id}`);
-  if(!team){ $("#btnPitch").disabled=false; return alert("Seleção não encontrada. Recarregue a página."); }
+  const [teamsAll, inscricoes] = await Promise.all([fb.get("copa_teams"), fb.get("copa_inscricoes")]);
+  const all = teamsAll || {};
+  const lower = nome.toLowerCase();
+
+  /* procura a seleção já existente em copa_teams pelo nome */
+  let id = Object.keys(all).find(k => (all[k].name||"").toLowerCase() === lower);
+  /* se não existe em teams, tenta puxar mentor/jogadores da inscrição */
+  const ins = Object.values(inscricoes||{}).find(t => (t.selecao||"").toLowerCase() === lower);
+  if(!id) id = "t"+Date.now()+Math.random().toString(36).slice(2,6);
+
+  const conv = ins || {};
+  const convPlayers = (conv.players||[]).map(p=> typeof p==="string"? p : p.nome).filter(Boolean);
   const detail = `Problema: ${problema}\n\nComo aplicar: ${aplicar}`;
-  /* completa a seleção já existente com os dados do pitch */
-  Object.assign(team, {valor:selValor, proposal:titulo, problema, aplicar, detail, url, pitchEnviado:true});
+
+  const team = {
+    id, flag: siglaDe(nome), name: nome,
+    coach: conv.mentor || all[id]?.coach || "",
+    players: convPlayers.length ? convPlayers : (all[id]?.players || []),
+    valor:selValor, proposal:titulo, problema, aplicar, detail, url,
+    pitchEnviado:true,
+    createdAt: all[id]?.createdAt || new Date().toISOString()
+  };
   await fb.put(`copa_teams/${id}`, team);
-  await fb.put(`copa_pitches/${id}`, {team:team.name, url, valor:selValor, proposal:titulo, submittedAt:new Date().toISOString()});
+  await fb.put(`copa_pitches/${id}`, {team:nome, url, valor:selValor, proposal:titulo, submittedAt:new Date().toISOString()});
   $("#btnPitch").disabled = false;
-  /* limpa campos e recarrega a lista (marca como enviado) */
-  ["pTitulo","pProblema","pAplicar","pUrl"].forEach(i=>$("#"+i).value="");
+  /* limpa campos */
+  ["pNome","pTitulo","pProblema","pAplicar","pUrl"].forEach(i=>$("#"+i).value="");
   selValor=null; $$(".chip").forEach(x=>x.classList.remove("on"));
-  $("#pSelect").value="";
-  carregarSelecoesPitch();
   flash("#bannerPitch");
 };
 
