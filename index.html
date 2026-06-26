@@ -284,14 +284,14 @@ footer{text-align:center;color:rgba(255,255,255,.35);font-size:13px;margin-top:5
 <section class="screen" id="scr-chave">
   <button class="back" data-go="home">← Voltar</button>
   <div class="card" id="chaveLock">
-    <div class="lock"><div class="ic">🔒</div>
-      <h2>Sorteio ainda não realizado</h2>
-      <p style="color:var(--txt2)">Aguarde a administradora realizar o sorteio dos 4 grupos em 15/07.</p>
+    <div class="lock"><div class="ic">⚽</div>
+      <h2>Nenhuma seleção inscrita ainda</h2>
+      <p style="color:var(--txt2)">Assim que as seleções forem convocadas, elas aparecem aqui divididas nos Grupos A e B.</p>
       <button class="btn sec" data-go="home">Voltar</button>
     </div>
   </div>
   <div id="chaveContent" style="display:none">
-    <div class="card"><h2>Os 4 grupos</h2><div class="groups" id="groupsGrid"></div></div>
+    <div class="card"><h2>Grupos A e B</h2><div class="groups" id="groupsGrid"></div></div>
     <div class="card" id="championCard" style="display:none"></div>
   </div>
 </section>
@@ -528,30 +528,63 @@ function rankByCount(ids, count){ return ids.slice().sort((a,b)=>(count[b]||0)-(
 ========================================================= */
 async function renderChave(){
   await loadData();
-  const has = bracket && bracket.groups;
-  $("#chaveLock").style.display = has ? "none":"block";
-  $("#chaveContent").style.display = has ? "block":"none";
-  if(!has) return;
-  const apurado = bracket.finalists && Object.keys(bracket.finalists).length;
-  const blocks = await Promise.all(GROUPS_I.map(async g=>{
-    const ids = bracket.groups[g] || [];
-    const {count} = await golsGrupo(g);
-    const rank = rankByCount(ids, count);
-    const fin = bracket.finalists?.[g] || [];
-    return `<div class="group g${g}"><h3>Grupo ${g} <small style="font-size:13px;color:var(--txt2)">${ids.length} seleções</small></h3>
+  const inscricoes = await fb.get("copa_inscricoes") || {};
+  const temSorteio = bracket && bracket.groups;
+
+  /* monta os grupos: do sorteio, se houver; senão, distribui as seleções inscritas (1ª→A, 2ª→B...) */
+  let grupos, fonteTeams;
+  if(temSorteio){
+    grupos = {A: bracket.groups.A||[], B: bracket.groups.B||[]};
+    fonteTeams = teams;
+  } else {
+    const lista = Object.entries(inscricoes)
+      .sort((a,b)=>(a[1].createdAt||"").localeCompare(b[1].createdAt||""));
+    grupos = {A:[], B:[]};
+    fonteTeams = {};
+    lista.forEach(([id,ins],i)=>{
+      const g = i%2===0 ? "A" : "B";
+      grupos[g].push(id);
+      fonteTeams[id] = {
+        flag: (ins.selecao||"").replace(/[^A-Za-zÀ-ú]/g,"").toUpperCase().slice(0,3) || "SEL",
+        name: ins.selecao||"Seleção",
+        coach: ins.mentor||"",
+        players: (ins.players||[]).map(p=> typeof p==="string"? {nome:p} : p)
+      };
+    });
+  }
+
+  const semNada = grupos.A.length===0 && grupos.B.length===0;
+  $("#chaveLock").style.display = semNada ? "block":"none";
+  $("#chaveContent").style.display = semNada ? "none":"block";
+  if(semNada) return;
+
+  const apurado = temSorteio && bracket.finalists && Object.keys(bracket.finalists).length;
+  const blocks = await Promise.all(["A","B"].map(async g=>{
+    const ids = grupos[g] || [];
+    const count = temSorteio ? (await golsGrupo(g)).count : {};
+    const rank = temSorteio ? rankByCount(ids, count) : ids;
+    const fin = bracket?.finalists?.[g] || [];
+    const cor = g==="A" ? "var(--amarelo)" : "var(--ciano)";
+    return `<div class="group g${g}"><h3 style="color:${cor}">Grupo ${g} <small style="font-size:13px;color:var(--txt2)">${ids.length} ${ids.length===1?"seleção":"seleções"}</small></h3>
       ${rank.map((id,i)=>{
-        const classif = fin.length ? fin.includes(id) : i<2;
-        return `<div class="mteam${classif?" win":""}">
-          <span class="sig" style="color:${COLORS[(teams[id]?.flag||"").charCodeAt(0)%5]}">${esc(teams[id]?.flag)}</span>${esc(teams[id]?.name||id)}
-          <span style="margin-left:auto;color:var(--amarelo);font-weight:700">${count[id]||0} ⚽</span>
-          ${classif?'<span style="color:var(--verde);margin-left:6px">✔</span>':""}</div>`;
-      }).join("")}
-      ${fin.length?`<div class="finalista">⭐ Classificados: ${fin.map(id=>esc(teams[id]?.name||"")).join(" e ")}</div>`
-        : '<p style="color:var(--txt2);font-size:12px;margin-top:8px">Os 2 mais votados se classificam para a Grande Final.</p>'}
+        const t = fonteTeams[id] || {};
+        const classif = temSorteio && (fin.length ? fin.includes(id) : i<2);
+        const jogadores = (t.players||[]).map(p=> typeof p==="string"? p : p.nome).filter(Boolean);
+        return `<div class="mteam${classif?" win":""}" style="flex-wrap:wrap">
+          <span class="sig" style="color:${COLORS[(t.flag||"").charCodeAt(0)%5]}">${esc(t.flag)}</span>
+          <b>${esc(t.name||id)}</b>
+          ${temSorteio?`<span style="margin-left:auto;color:var(--amarelo);font-weight:700">${count[id]||0} ⚽</span>`:""}
+          ${classif?'<span style="color:var(--verde);margin-left:6px">✔</span>':""}
+          <div style="flex-basis:100%;color:var(--txt2);font-size:13px;margin-top:4px">
+            ${t.coach?`Capitão: ${esc(t.coach)} · `:""}${jogadores.length} jogadores${jogadores.length?": "+jogadores.map(esc).join(", "):""}
+          </div></div>`;
+      }).join("") || '<p style="color:var(--txt2);font-size:13px">Nenhuma seleção neste grupo ainda.</p>'}
+      ${apurado && fin.length?`<div class="finalista">⭐ Classificados: ${fin.map(id=>esc(fonteTeams[id]?.name||"")).join(" e ")}</div>`:""}
     </div>`;
   }));
   $("#groupsGrid").innerHTML = blocks.join("");
-  if(bracket.champion && teams[bracket.champion]){
+
+  if(temSorteio && bracket.champion && teams[bracket.champion]){
     const c = teams[bracket.champion];
     $("#championCard").style.display="block";
     $("#championCard").innerHTML = `<div class="lock"><div class="ic">🏆</div><h2 style="color:var(--amarelo)">CAMPEÃ: ${esc(c.name)}</h2>
