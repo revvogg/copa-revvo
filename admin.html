@@ -120,7 +120,7 @@ a{color:var(--ciano)}
     <p style="color:var(--txt2);font-size:14px;margin-bottom:10px">⚠️ Irreversíveis. LGPD: ao fim do torneio, apague as inscrições — só retenha o necessário para a dinâmica.</p>
     <button class="btn danger mini" onclick="resetNode('copa_votes','todos os votos')">Zerar votos</button>
     <button class="btn danger mini" onclick="resetNode('copa_bracket','o chaveamento')">Apagar chaveamento</button>
-    <button class="btn danger mini" onclick="resetNode('copa_inscricoes','as inscrições de jogadores (LGPD)')">Apagar inscrições</button>
+    <button class="btn danger mini" onclick="resetInscricoes()">Apagar inscrições e seleções (LGPD)</button>
     <button class="btn danger mini" onclick="resetAll()">Resetar TUDO</button>
   </div>
 </section>
@@ -141,9 +141,9 @@ a{color:var(--ciano)}
     <h2>Sorteio dos 2 grupos</h2>
     <div class="hint" style="margin-bottom:12px">
       <b>Como o sorteio conversa com as fases:</b><br>
-      1. O sorteio só usa seleções que já <b>enviaram o pitch</b>.<br>
+      1. O sorteio usa as seleções <b>convocadas</b> (inscritas).<br>
       2. Ao sortear, as seleções são divididas nos <b>Grupos A e B</b> e os participantes passam a ver os grupos.<br>
-      3. Na fase de votação (03–05/08), a torcida vota nas seleções. No fim, clique em <b>"Apurar e classificar"</b> para definir os 4 finalistas (os 2 mais votados de cada grupo).
+      3. Depois do sorteio, cada seleção <b>envia o pitch</b> (proposta + vídeo). Na votação (03–05/08), a torcida vota. No fim, clique em <b>"Apurar e classificar"</b> para definir os 4 finalistas (os 2 mais votados de cada grupo).
     </div>
     <p style="color:var(--txt2);font-size:14px">Embaralha as seleções inscritas e distribui em <b>2 grupos (A e B)</b>. A votação é por acúmulo de gols dentro de cada grupo — os <b>2 mais votados</b> de cada um avançam para a Grande Final.</p>
     <button class="btn" onclick="sorteio()" style="margin-top:12px">🎲 Realizar sorteio</button>
@@ -178,7 +178,6 @@ a{color:var(--ciano)}
 
 <script>
 const DB = "https://copa-revvo-default-rtdb.firebaseio.com";
-const DEFAULT_PASS = "RevvoAdmin2026";
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 const fb={
   get:p=>fetch(`${DB}/${p}.json`).then(r=>r.json()),
@@ -195,12 +194,23 @@ $("#btnLogin").onclick=login;
 $("#loginPass").addEventListener("keydown",e=>{if(e.key==="Enter")login()});
 async function login(){
   $("#loginMsg").textContent="Verificando…";
-  let pass = await fb.get("copa_admin_pass");
-  if(pass===null){ await fb.put("copa_admin_pass", DEFAULT_PASS); pass=DEFAULT_PASS; }
-  if($("#loginPass").value===pass){
-    sessionStorage.copa_admin="1";
-    $("#loginOverlay").style.display="none"; $("#app").style.display="block"; refreshAll();
-  } else $("#loginMsg").textContent="Senha incorreta.";
+  const senha=$("#loginPass").value;
+  /* valida por escrita: a regra do Firebase só aceita gravar copa_admin_check
+     se a senha enviada conferir com copa_admin_pass — a senha nunca é lida. */
+  try{
+    const r = await fetch(`${DB}/copa_admin_check.json`, {
+      method:"PUT",
+      body: JSON.stringify({ pass: senha, at: Date.now() })
+    });
+    if(r.ok){
+      sessionStorage.copa_admin="1";
+      $("#loginOverlay").style.display="none"; $("#app").style.display="block"; refreshAll();
+    } else {
+      $("#loginMsg").textContent="Senha incorreta.";
+    }
+  }catch(e){
+    $("#loginMsg").textContent="Erro de conexão. Tente novamente.";
+  }
 }
 function logout(){ sessionStorage.removeItem("copa_admin"); location.reload(); }
 if(sessionStorage.copa_admin==="1"){ $("#loginOverlay").style.display="none"; $("#app").style.display="block"; refreshAll(); }
@@ -246,6 +256,11 @@ window.changePass=changePass;
 window.resetNode=async(node,label)=>{
   if(!confirm(`Apagar ${label}? Esta ação é irreversível.`)) return;
   await fb.del(node); refreshAll();
+};
+window.resetInscricoes=async()=>{
+  if(!confirm("Apagar as inscrições, as seleções e os pitches? (mantém grupos/votos)\nEsta ação é irreversível.")) return;
+  await Promise.all(["copa_inscricoes","copa_teams","copa_pitches"].map(fb.del));
+  refreshAll();
 };
 window.resetAll=async()=>{
   if(!confirm("Resetar TODO o torneio (seleções, pitches, votos, grupos, inscrições)?")) return;
@@ -297,11 +312,12 @@ function renderPitches(){
   /* índice de inscrições por nome de seleção (para cruzar) */
   const inscByName={}; Object.values(insc).forEach(t=>{ if(t.selecao) inscByName[t.selecao.toLowerCase()]=t; });
 
+  const enviados = rows.filter(t=>t.pitchEnviado).length;
   $("#pitchTable").innerHTML = `
     <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px">
       <button class="btn green mini" onclick="exportPitches()">⬇ Relatório de pitches (CSV)</button>
       <button class="btn sec mini" onclick="exportCruzado()">⬇ Relatório cruzado inscrição × pitch (CSV)</button>
-      <span class="tag">${rows.length} pitches</span>
+      <span class="tag">${rows.length} seleções</span><span class="tag">${enviados} com pitch</span>
     </div>
     ${rows.map(t=>{
       const conv=inscByName[(t.name||"").toLowerCase()];
@@ -310,7 +326,7 @@ function renderPitches(){
         <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap">
           <div><b style="font-size:17px;color:var(--amarelo)">${esc(t.flag)} · ${esc(t.name)}</b>
             <div style="color:var(--txt2);font-size:13px">Capitão: ${esc(t.coach||"—")} · ${(t.players||[]).length} jogadores${grupo?` · Grupo ${grupo}`:""}
-              · ${conv?'<span style="color:var(--verde)">✔ inscrição vinculada</span>':'<span style="color:#ff8a8a">⚠ sem inscrição correspondente</span>'}</div></div>
+              · ${t.pitchEnviado?'<span style="color:var(--verde)">✔ pitch enviado</span>':'<span style="color:#ffcf6b">⏳ aguardando pitch</span>'}</div></div>
           ${t.url ? (String(t.url).startsWith("data:") ? '<span class="tag">📎 arquivo</span>' : `<a class="btn sec mini" href="${esc(t.url)}" target="_blank" rel="noopener">▶ ver vídeo</a>`) : '<span class="tag">sem vídeo</span>'}
         </div>
         <table style="margin-top:10px">
@@ -376,7 +392,7 @@ function baixarCSV(lines, nome){
 /* ================= SORTEIO / CHAVES ================= */
 window.sorteio=async()=>{
   const ids=Object.keys(teams);
-  if(ids.length<2) return alert("É preciso ter pelo menos 2 seleções com pitch enviado para sortear.");
+  if(ids.length<2) return alert("É preciso ter pelo menos 2 seleções convocadas para sortear.");
   if(bracket && !confirm("Já existe um sorteio. Refazer apaga os grupos e os votos. Continuar?")) return;
   /* embaralha */
   for(let i=ids.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [ids[i],ids[j]]=[ids[j],ids[i]]; }
@@ -460,18 +476,41 @@ function renderJogo(){
       ${jaApurado?'<span class="tag" style="margin-left:8px;color:var(--verde)">já apurado</span>':""}
     </div>`;
 
+  /* qualquer seleção pode ser coroada; as finalistas aparecem destacadas no topo da lista */
   const fins=[].concat(...GROUPS.map(g=>(bracket.finalists?.[g]||[])));
-  $("#championControls").innerHTML = fins.length
-    ? fins.map(id=>{ const g=GROUPS.find(gr=>(bracket.finalists[gr]||[]).includes(id));
-        return `<button class="btn green mini" style="margin:4px" onclick="declareChampion('${id}')">🏆 ${esc(teams[id]?.name)} (Grupo ${g})</button>`; }).join("")
-      + (bracket.champion?`<p style="margin-top:10px;color:var(--amarelo);font-weight:700">Campeã atual: ${esc(teams[bracket.champion]?.name)}</p>`:"")
-    : "<p style='color:var(--txt2)'>Ainda não há finalistas. Use \"Apurar e classificar\" após a votação.</p>";
+  const todas=Object.keys(teams);
+  const ordenadas=[...fins, ...todas.filter(id=>!fins.includes(id))];
+  const opts=ordenadas.map(id=>{
+    const g=GROUPS.find(gr=>(bracket.groups?.[gr]||[]).includes(id));
+    const ehFinal=fins.includes(id);
+    return `<option value="${id}"${bracket.champion===id?" selected":""}>${ehFinal?"⭐ ":""}${esc(teams[id]?.name)}${g?` (Grupo ${g})`:""}${ehFinal?" — finalista":""}</option>`;
+  }).join("");
+
+  $("#championControls").innerHTML = todas.length ? `
+    <p style="margin-bottom:8px;color:var(--txt2);font-size:14px">Escolha a seleção campeã e confirme. Ao coroar, a tela dos participantes exibe o <b>anúncio da campeã com animação e confete</b> automaticamente.</p>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+      <select id="selCampea" style="max-width:420px;min-width:260px">${opts}</select>
+      <button class="btn green" onclick="declareChampion(document.getElementById('selCampea').value)">🏆 Coroar campeã</button>
+      ${bracket.champion?`<button class="btn sec mini" onclick="descoronarCampea()">↩ Desfazer</button>`:""}
+    </div>
+    ${bracket.champion?`<p style="margin-top:12px;color:var(--amarelo);font-weight:700;font-size:18px">🏆 Campeã atual: ${esc(teams[bracket.champion]?.name)}</p>`
+      :`<p style="margin-top:10px;color:var(--txt2);font-size:13px">Dica: normalmente você coroa após a votação e a apuração — mas pode coroar a qualquer momento.</p>`}
+  ` : "<p style='color:var(--txt2)'>Nenhuma seleção cadastrada ainda.</p>";
 }
 window.declareChampion=async id=>{
-  if(!confirm(`Declarar ${teams[id]?.name} CAMPEÃ da Copa Revvo 2026?`)) return;
+  if(!id) return alert("Selecione uma seleção.");
+  if(!confirm(`Declarar ${teams[id]?.name} CAMPEÃ da Copa Revvo 2026?\n\nAo confirmar, a tela dos participantes mostra o anúncio da campeã com confete.`)) return;
   bracket.champion=id;
   await fb.put("copa_bracket/champion",id);
   await fb.put("copa_phase","fim");
+  alert(`🏆 ${teams[id]?.name} é a campeã!\n\nQuem abrir a aba VOTAR já vê a festa. Se estiverem com a tela aberta, ela atualiza sozinha em alguns segundos.`);
+  refreshAll();
+};
+window.descoronarCampea=async()=>{
+  if(!confirm("Desfazer a coroação da campeã? A tela dos participantes volta a mostrar as finalistas.")) return;
+  bracket.champion=null;
+  await fb.put("copa_bracket/champion",null);
+  await fb.put("copa_phase","final");
   refreshAll();
 };
 
